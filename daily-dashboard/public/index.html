@@ -1,29 +1,206 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Daily Dashboard</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>Daily Dashboard</h1>
-    <p id="lastUpdate">Lade Daten...</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All My Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-    <section class="card">
-      <h2>News</h2>
-      <div id="news">Lade News...</div>
-    </section>
+<header class="header">
+  <div class="header-top">
+    <div class="brand">
+      <span class="brand-name">All My Day</span>
+      <span class="brand-sub" id="headerDate"></span>
+    </div>
+    <div class="header-right">
+      <span class="header-time" id="headerTime"></span>
+      <button class="refresh-btn" onclick="refreshData()" title="Aktualisieren">
+        <i data-lucide="refresh-cw"></i>
+      </button>
+    </div>
+  </div>
+  <nav class="topnav">
+    <button class="nav-btn active" data-section="overview">
+      <i data-lucide="layout-dashboard"></i><span>Übersicht</span>
+    </button>
+    <button class="nav-btn" data-section="wetter">
+      <i data-lucide="cloud-sun"></i><span>Wetter</span>
+    </button>
+    <button class="nav-btn" data-section="zeitung">
+      <i data-lucide="newspaper"></i><span>Zeitung</span>
+    </button>
+    <button class="nav-btn" data-section="sport">
+      <i data-lucide="trophy"></i><span>Sport</span>
+    </button>
+    <button class="nav-btn" data-section="rohstoffe">
+      <i data-lucide="coins"></i><span>Rohstoffe</span>
+    </button>
+    <button class="nav-btn" data-section="aktien">
+      <i data-lucide="trending-up"></i><span>Aktien</span>
+    </button>
+  </nav>
+</header>
 
-    <section class="card">
-      <h2>Wetter</h2>
-      <div id="weather">Lade Wetter...</div>
-    </section>
+<main class="main">
 
-    <section class="card">
-      <h2>Krypto</h2>
-      <div id="crypto">Lade Krypto...</div>
-    </section>
+  <!-- ÜBERSICHT -->
+  <section id="overview" class="section active">
+    <div class="overview-hero">
 
-    <script src="app.js"></script>
-  </body>
+      <div class="card weather-hero">
+        <div class="card-label"><i data-lucide="cloud-sun"></i> Zürich</div>
+        <div class="weather-temp-big" id="ovTemp">--°</div>
+        <div class="weather-stats">
+          <div class="weather-stat"><i data-lucide="wind"></i><span id="ovWind">--</span> km/h Wind</div>
+          <div class="weather-stat"><i data-lucide="droplets"></i><span id="ovRain">--</span> mm Regen</div>
+        </div>
+      </div>
+
+      <div class="card news-card">
+        <div class="card-label"><i data-lucide="newspaper"></i> Aktuelles</div>
+        <div id="ovNews" class="news-list">
+          <div class="skeleton"></div><div class="skeleton"></div>
+          <div class="skeleton"></div><div class="skeleton"></div>
+          <div class="skeleton short"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="markets-row">
+      <div class="market-card">
+        <div class="market-icon bitcoin"><i data-lucide="bitcoin"></i></div>
+        <div class="market-info">
+          <div class="market-name">Bitcoin</div>
+          <div class="market-price" id="ovBtc">--</div>
+          <div class="market-unit">CHF</div>
+        </div>
+      </div>
+      <div class="market-card">
+        <div class="market-icon ethereum"><i data-lucide="hexagon"></i></div>
+        <div class="market-info">
+          <div class="market-name">Ethereum</div>
+          <div class="market-price" id="ovEth">--</div>
+          <div class="market-unit">CHF</div>
+        </div>
+      </div>
+      <div class="market-card">
+        <div class="market-icon solana"><i data-lucide="zap"></i></div>
+        <div class="market-info">
+          <div class="market-name">Solana</div>
+          <div class="market-price" id="ovSol">--</div>
+          <div class="market-unit">CHF</div>
+        </div>
+      </div>
+      <div class="market-card disabled">
+        <div class="market-icon gas"><i data-lucide="flame"></i></div>
+        <div class="market-info">
+          <div class="market-name">Erdgas</div>
+          <div class="market-price">--</div>
+          <div class="market-unit">Bald</div>
+        </div>
+      </div>
+      <div class="market-card disabled">
+        <div class="market-icon smi"><i data-lucide="bar-chart-2"></i></div>
+        <div class="market-info">
+          <div class="market-name">SMI</div>
+          <div class="market-price">--</div>
+          <div class="market-unit">Bald</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WETTER -->
+  <section id="wetter" class="section">
+    <div class="section-title"><i data-lucide="cloud-sun"></i> Wetter — Zürich</div>
+    <div class="detail-grid">
+      <div class="card detail-card accent-orange">
+        <div class="detail-icon"><i data-lucide="thermometer"></i></div>
+        <div class="detail-label">Temperatur</div>
+        <div class="detail-value" id="detTemp">--</div>
+        <div class="detail-unit">°C</div>
+      </div>
+      <div class="card detail-card accent-blue">
+        <div class="detail-icon"><i data-lucide="wind"></i></div>
+        <div class="detail-label">Wind</div>
+        <div class="detail-value" id="detWind">--</div>
+        <div class="detail-unit">km/h</div>
+      </div>
+      <div class="card detail-card accent-cyan">
+        <div class="detail-icon"><i data-lucide="droplets"></i></div>
+        <div class="detail-label">Niederschlag</div>
+        <div class="detail-value" id="detRain">--</div>
+        <div class="detail-unit">mm</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZEITUNG -->
+  <section id="zeitung" class="section">
+    <div class="section-title"><i data-lucide="newspaper"></i> Nachrichten</div>
+    <div class="card">
+      <div id="newsFullList" class="news-full-list">Lade...</div>
+    </div>
+  </section>
+
+  <!-- SPORT -->
+  <section id="sport" class="section">
+    <div class="section-title"><i data-lucide="trophy"></i> Sport</div>
+    <div class="card placeholder-card">
+      <div class="placeholder-icon"><i data-lucide="construction"></i></div>
+      <p>Sportdaten folgen bald.</p>
+      <p class="muted">Script <code>scripts/sport.sh</code> noch nicht erstellt.</p>
+    </div>
+  </section>
+
+  <!-- ROHSTOFFE -->
+  <section id="rohstoffe" class="section">
+    <div class="section-title"><i data-lucide="coins"></i> Rohstoffe &amp; Krypto</div>
+    <div class="detail-grid">
+      <div class="card detail-card accent-yellow">
+        <div class="detail-icon"><i data-lucide="bitcoin"></i></div>
+        <div class="detail-label">Bitcoin</div>
+        <div class="detail-value small" id="detBtc">--</div>
+        <div class="detail-unit">CHF</div>
+      </div>
+      <div class="card detail-card accent-indigo">
+        <div class="detail-icon"><i data-lucide="hexagon"></i></div>
+        <div class="detail-label">Ethereum</div>
+        <div class="detail-value small" id="detEth">--</div>
+        <div class="detail-unit">CHF</div>
+      </div>
+      <div class="card detail-card accent-purple">
+        <div class="detail-icon"><i data-lucide="zap"></i></div>
+        <div class="detail-label">Solana</div>
+        <div class="detail-value" id="detSol">--</div>
+        <div class="detail-unit">CHF</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AKTIEN -->
+  <section id="aktien" class="section">
+    <div class="section-title"><i data-lucide="trending-up"></i> Aktien</div>
+    <div class="card placeholder-card">
+      <div class="placeholder-icon"><i data-lucide="construction"></i></div>
+      <p>Aktiendaten folgen bald.</p>
+      <p class="muted">Script <code>scripts/stocks.sh</code> noch nicht erstellt.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span id="lastUpdate">–</span>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="app.js"></script>
+</body>
 </html>

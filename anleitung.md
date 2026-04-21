@@ -318,6 +318,13 @@ git branch -M main
 git push -u origin main
 ```
 
+**Falls der Push mit `rejected (fetch first)` fehlschlägt** (GitHub hat Commits, die lokal fehlen):
+
+```bash
+git pull origin main --allow-unrelated-histories
+git push -u origin main
+```
+
 ---
 
 ## Teil 7 – WSL Ubuntu vorbereiten
@@ -326,8 +333,8 @@ git push -u origin main
 sudo apt update
 sudo apt install git curl jq python3 cron -y
 
-git config --global user.name "DEIN NAME"
-git config --global user.email "DEINE_EMAIL"
+git config --global user.name "TheGoldenAlpha"
+git config --global user.email "florian.halter2009@icloud.com"
 ```
 
 ---
@@ -335,7 +342,8 @@ git config --global user.email "DEINE_EMAIL"
 ## Teil 8 – SSH-Key in WSL erstellen
 
 ```bash
-ssh-keygen -t ed25519 -C "DEINE_EMAIL"
+ssh-keygen -t ed25519 -C "florian.halter2009@icloud.com"
+# Bei allen Fragen einfach Enter drücken
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub
@@ -351,16 +359,17 @@ Verbindung testen:
 ssh -T git@github.com
 ```
 
-Wenn da steht `Hi DEINNAME! You've successfully authenticated...` passt es.
+Wenn da steht `Hi TheGoldenAlpha! You've successfully authenticated...` passt es.
 
 ---
 
 ## Teil 9 – Repository in WSL klonen
 
 ```bash
-cd ~
-git clone git@github.com:DEINNAME/daily-dashboard.git
-cd daily-dashboard
+mkdir -p ~/pr2/src
+cd ~/pr2/src
+git clone git@github.com:TheGoldenAlpha/M122.git
+cd M122/daily-dashboard
 chmod +x scripts/*.sh
 bash scripts/update.sh
 ls data
@@ -374,14 +383,14 @@ cat data/weather.json
 Wichtig: Den Server im Projektordner starten, nicht in `public/`, weil `app.js` auf `../data/` zugreift.
 
 ```bash
-cd ~/daily-dashboard
-python3 -m http.server 8000 --bind 127.0.0.1
+cd ~/pr2/src/M122/daily-dashboard
+python3 -m http.server 8347 --bind 127.0.0.1
 ```
 
 Dann im Windows-Browser:
 
 ```
-http://localhost:8000/public/
+http://localhost:8347/public/
 ```
 
 ---
@@ -396,8 +405,8 @@ crontab -e
 Ganz unten einfügen (Username mit `whoami` herausfinden):
 
 ```
-*/10 * * * * cd /home/DEIN_USERNAME/daily-dashboard && git pull >> logs/gitpull.log 2>&1
-*/10 * * * * cd /home/DEIN_USERNAME/daily-dashboard && bash scripts/update.sh >> logs/cron-update.log 2>&1
+*/10 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && git pull >> logs/gitpull.log 2>&1
+*/10 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && bash scripts/update.sh >> logs/cron-update.log 2>&1
 ```
 
 Alle 10 Minuten: neuen Code holen und Daten aktualisieren.
@@ -445,19 +454,19 @@ sudo apt install jq -y
 ```bash
 git remote -v
 # Wenn da https://... steht:
-git remote set-url origin git@github.com:DEINNAME/daily-dashboard.git
+git remote set-url origin git@github.com:TheGoldenAlpha/M122.git
 ```
 
 **Cron läuft nicht:**
 
 ```bash
 sudo service cron start
-cat ~/daily-dashboard/logs/cron-update.log
+cat ~/pr2/src/M122/daily-dashboard/logs/cron-update.log
 ```
 
 **Port 8000 belegt:**
 
 ```bash
-python3 -m http.server 8080 --bind 127.0.0.1
-# Dann: http://localhost:8080/public/
+python3 -m http.server 8347 --bind 127.0.0.1
+# Dann: http://localhost:8347/public/
 ```
