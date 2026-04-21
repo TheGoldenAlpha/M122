@@ -302,11 +302,19 @@ echo "Update fertig: $(date)" >> "$LOG_DIR/update.log"
 In Git Bash auf Windows, im Projektordner:
 
 ```bash
+cd C:\Users\flori\Desktop\Module\M122\AllMyDay
 git init
 git add .
 git commit -m "Start daily dashboard"
 git branch -M main
-git remote add origin git@github.com:DEINNAME/daily-dashboard.git
+git remote add origin https://github.com/TheGoldenAlpha/M122.git
+git push -u origin main
+```
+
+**Falls der Push mit `error: src refspec main does not match any` fehlschlägt** (passiert wenn Git den Branch `master` statt `main` nennt):
+
+```bash
+git branch -M main
 git push -u origin main
 ```
 
