@@ -43,6 +43,9 @@
     <button class="nav-btn" data-section="aktien">
       <i data-lucide="trending-up"></i><span>Aktien</span>
     </button>
+    <button class="nav-btn" data-section="coins">
+      <i data-lucide="bitcoin"></i><span>Coins</span>
+    </button>
   </nav>
 </header>
 
@@ -171,10 +174,22 @@
   <!-- SPORT -->
   <section id="sport" class="section">
     <div class="section-title"><i data-lucide="trophy"></i> Sport</div>
-    <div class="card placeholder-card">
-      <div class="placeholder-icon"><i data-lucide="construction"></i></div>
-      <p>Sportdaten folgen bald.</p>
-      <p class="muted">Script <code>scripts/sport.sh</code> noch nicht erstellt.</p>
+    <div class="sport-cats">
+      <button class="sport-cat active" data-sport="fussball"><i data-lucide="circle-dot"></i> Fussball</button>
+      <button class="sport-cat" data-sport="eishockey"><i data-lucide="snowflake"></i> Eishockey</button>
+      <button class="sport-cat" data-sport="unihockey"><i data-lucide="zap"></i> Unihockey</button>
+      <button class="sport-cat" data-sport="handball"><i data-lucide="hand"></i> Handball</button>
+      <button class="sport-cat" data-sport="tennis"><i data-lucide="activity"></i> Tennis</button>
+      <button class="sport-cat" data-sport="ski"><i data-lucide="mountain"></i> Ski</button>
+      <button class="sport-cat" data-sport="leichtathletik"><i data-lucide="timer"></i> Leichtathletik</button>
+      <button class="sport-cat" data-sport="basketball"><i data-lucide="circle"></i> Basketball</button>
+      <button class="sport-cat" data-sport="formel1"><i data-lucide="gauge"></i> Formel 1</button>
+      <button class="sport-cat" data-sport="volleyball"><i data-lucide="sun"></i> Volleyball</button>
+    </div>
+    <div class="card">
+      <div id="sportList" class="news-full-list">
+        <div style="padding:24px;color:var(--text-muted)">Lade Sportdaten...</div>
+      </div>
     </div>
   </section>
 
@@ -206,10 +221,111 @@
   <!-- AKTIEN -->
   <section id="aktien" class="section">
     <div class="section-title"><i data-lucide="trending-up"></i> Aktien</div>
-    <div class="card placeholder-card">
-      <div class="placeholder-icon"><i data-lucide="construction"></i></div>
-      <p>Aktiendaten folgen bald.</p>
-      <p class="muted">Script <code>scripts/stocks.sh</code> noch nicht erstellt.</p>
+
+    <div id="stocksOverview">
+      <div class="stocks-grid" id="stocksGrid">
+        <div style="padding:24px;color:var(--text-muted)">Lade Kurse...</div>
+      </div>
+    </div>
+
+    <div id="stockDetail" class="stock-detail hidden">
+      <button class="stock-back" onclick="closeStockDetail()">
+        <i data-lucide="arrow-left"></i> Alle Aktien
+      </button>
+      <div class="stock-detail-header card">
+        <div class="stock-detail-left">
+          <div class="stock-detail-symbol" id="detSymbol"></div>
+          <div class="stock-detail-name" id="detName"></div>
+          <div class="stock-detail-sector" id="detSector"></div>
+        </div>
+        <div class="stock-detail-right">
+          <div class="stock-detail-price" id="detPrice"></div>
+          <div class="stock-detail-change" id="detChange"></div>
+        </div>
+      </div>
+      <div class="stock-stats-grid">
+        <div class="card stock-stat">
+          <div class="stock-stat-label">Eröffnung</div>
+          <div class="stock-stat-val" id="detOpen"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">Tageshoch</div>
+          <div class="stock-stat-val" id="detHigh"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">Tagestief</div>
+          <div class="stock-stat-val" id="detLow"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">Marktkapitalisierung</div>
+          <div class="stock-stat-val" id="detMcap"></div>
+        </div>
+      </div>
+      <div class="card stock-info-card">
+        <div class="stock-info-title"><i data-lucide="info"></i> Über das Unternehmen</div>
+        <div class="stock-info-text" id="detDesc"></div>
+      </div>
+      <div class="card stock-info-card">
+        <div class="stock-info-title"><i data-lucide="shopping-cart"></i> Wo kaufen?</div>
+        <div class="stock-buy-links" id="detBuy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COINS -->
+  <section id="coins" class="section">
+    <div class="section-title"><i data-lucide="bitcoin"></i> Kryptowährungen</div>
+
+    <div id="coinsOverview">
+      <div class="stocks-grid" id="coinsGrid">
+        <div style="padding:24px;color:var(--text-muted)">Lade Coins...</div>
+      </div>
+    </div>
+
+    <div id="coinDetail" class="stock-detail hidden">
+      <button class="stock-back" onclick="closeCoinDetail()">
+        <i data-lucide="arrow-left"></i> Alle Coins
+      </button>
+      <div class="stock-detail-header card">
+        <div class="stock-detail-left" style="display:flex;align-items:center;gap:16px;">
+          <img id="detCoinImg" src="" alt="" class="coin-detail-img" />
+          <div>
+            <div class="stock-detail-symbol" id="detCoinSymbol"></div>
+            <div class="stock-detail-name"   id="detCoinName"></div>
+            <div class="stock-detail-sector" id="detCoinSector"></div>
+          </div>
+        </div>
+        <div class="stock-detail-right">
+          <div class="stock-detail-price"  id="detCoinPrice"></div>
+          <div class="stock-detail-change" id="detCoinChange"></div>
+        </div>
+      </div>
+      <div class="stock-stats-grid">
+        <div class="card stock-stat">
+          <div class="stock-stat-label">24h Hoch</div>
+          <div class="stock-stat-val" id="detCoinHigh"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">24h Tief</div>
+          <div class="stock-stat-val" id="detCoinLow"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">Marktkapitalisierung</div>
+          <div class="stock-stat-val" id="detCoinMcap"></div>
+        </div>
+        <div class="card stock-stat">
+          <div class="stock-stat-label">24h Volumen</div>
+          <div class="stock-stat-val" id="detCoinVol"></div>
+        </div>
+      </div>
+      <div class="card stock-info-card">
+        <div class="stock-info-title"><i data-lucide="info"></i> Über diesen Coin</div>
+        <div class="stock-info-text" id="detCoinDesc"></div>
+      </div>
+      <div class="card stock-info-card">
+        <div class="stock-info-title"><i data-lucide="shopping-cart"></i> Wo kaufen?</div>
+        <div class="stock-buy-links" id="detCoinBuy"></div>
+      </div>
     </div>
   </section>
 
