@@ -408,6 +408,98 @@ body {
 .accent-purple .detail-icon { color: #8b5cf6; }
 .accent-purple .detail-value { color: #7c3aed; }
 
+/* ── WEATHER CONTROLS ── */
+.weather-controls {
+  margin-bottom: 16px;
+}
+
+.weather-controls-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.weather-controls-top .section-title { margin-bottom: 0; }
+
+.city-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 8px 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.city-selector svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+
+.city-selector select {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: transparent;
+  cursor: pointer;
+}
+
+.hour-selector {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.hour-selector::-webkit-scrollbar { display: none; }
+
+.hour-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.hour-btn .hour-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.hour-btn .hour-temp {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hour-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.hour-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+}
+
+.hour-btn.active .hour-label,
+.hour-btn.active .hour-temp {
+  color: #ffffff;
+}
+
 /* ── NEWS FULL LIST ── */
 .news-full-list {}
 

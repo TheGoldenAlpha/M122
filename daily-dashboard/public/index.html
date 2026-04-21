@@ -118,7 +118,26 @@
 
   <!-- WETTER -->
   <section id="wetter" class="section">
-    <div class="section-title"><i data-lucide="cloud-sun"></i> Wetter — Zürich</div>
+    <div class="weather-controls">
+      <div class="weather-controls-top">
+        <div class="section-title"><i data-lucide="cloud-sun"></i> Wetter — <span id="weatherCityLabel">Zürich</span></div>
+        <div class="city-selector">
+          <i data-lucide="map-pin"></i>
+          <select id="citySelect" onchange="loadWeatherDetail()">
+            <option value="47.3769,8.5417">Zürich</option>
+            <option value="46.9481,7.4474">Bern</option>
+            <option value="47.5596,7.5886">Basel</option>
+            <option value="46.2044,6.1432">Genf</option>
+            <option value="46.5197,6.6323">Lausanne</option>
+            <option value="47.0502,8.3093">Luzern</option>
+            <option value="47.4245,9.3767">St. Gallen</option>
+            <option value="46.0037,8.9511">Lugano</option>
+            <option value="47.4994,8.7240">Winterthur</option>
+          </select>
+        </div>
+      </div>
+      <div class="hour-selector" id="hourSelector"></div>
+    </div>
     <div class="detail-grid">
       <div class="card detail-card accent-orange">
         <div class="detail-icon"><i data-lucide="thermometer"></i></div>

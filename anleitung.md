@@ -405,8 +405,8 @@ crontab -e
 Ganz unten einfügen (Username mit `whoami` herausfinden):
 
 ```
-*/10 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && git pull >> logs/gitpull.log 2>&1
-*/10 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && bash scripts/update.sh >> logs/cron-update.log 2>&1
+*/2 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && git pull >> logs/gitpull.log 2>&1
+*/2 * * * * cd /home/florianh/pr2/src/M122/daily-dashboard && bash scripts/update.sh >> logs/cron-update.log 2>&1
 ```
 
 Alle 10 Minuten: neuen Code holen und Daten aktualisieren.
