@@ -8,7 +8,7 @@ TMP_FILE="$DATA_DIR/sport.tmp"
 
 python3 - << 'PYEOF' > "$TMP_FILE"
 import urllib.request, urllib.parse, json, xml.etree.ElementTree as ET
-import sys
+import html, re, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SPORTS = [
@@ -39,7 +39,10 @@ def fetch_sport(key_query):
         items = []
         for item in root.findall("./channel/item")[:10]:
             title = item.findtext("title", "").strip()
-            link  = item.findtext("link",  "").strip()
+            # Echte Artikel-URL aus der HTML-Description extrahieren
+            desc  = html.unescape(item.findtext("description", ""))
+            match = re.search(r'href="(https?://[^"]+)"', desc)
+            link  = match.group(1) if match else item.findtext("link", "").strip()
             if title:
                 items.append({"title": title, "url": link})
         return key, items

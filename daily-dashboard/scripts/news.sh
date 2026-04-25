@@ -7,7 +7,7 @@ TMP_FILE="$DATA_DIR/news.tmp"
 OUT_FILE="$DATA_DIR/news.json"
 
 python3 - << 'PYEOF' > "$TMP_FILE"
-import urllib.request, json, xml.etree.ElementTree as ET, sys
+import urllib.request, json, xml.etree.ElementTree as ET, html, re, sys
 
 url = "https://news.google.com/rss?hl=de&gl=CH&ceid=CH:de"
 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -18,13 +18,15 @@ try:
     items = []
     for item in root.findall("./channel/item")[:15]:
         title = item.findtext("title", "").strip()
-        link  = item.findtext("link",  "").strip()
+        # Echte Artikel-URL aus der HTML-Description extrahieren
+        desc  = html.unescape(item.findtext("description", ""))
+        match = re.search(r'href="(https?://[^"]+)"', desc)
+        link  = match.group(1) if match else item.findtext("link", "").strip()
         if title:
             items.append({"title": title, "url": link})
     print(json.dumps({"items": items}, ensure_ascii=False))
     sys.exit(0)
 except Exception as e:
-    print(json.dumps({"items": []}), file=sys.stderr)
     print(json.dumps({"items": []}))
     sys.exit(1)
 PYEOF
