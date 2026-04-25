@@ -1,7 +1,24 @@
-async function loadJson(path) {
-  const res = await fetch(path + "?t=" + Date.now());
-  if (!res.ok) throw new Error("Fehler: " + path);
-  return res.json();
+async function loadJson(path, timeoutMs = 8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(path + "?t=" + Date.now(), { signal: ctrl.signal });
+    if (!res.ok) throw new Error("Fehler: " + path);
+    return res.json();
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+async function fetchWithTimeout(url, timeoutMs = 8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    return res.json();
+  } finally {
+    clearTimeout(tid);
+  }
 }
 
 function updateClock() {
@@ -33,8 +50,7 @@ async function fetchOpenMeteo(lat, lon) {
     `&hourly=temperature_2m,wind_speed_10m,precipitation` +
     `&current=temperature_2m,wind_speed_10m,precipitation` +
     `&timezone=Europe%2FZurich&forecast_days=1`;
-  const res = await fetch(url);
-  return res.json();
+  return fetchWithTimeout(url, 10000);
 }
 
 function displayWeatherForHour(data, hour) {
