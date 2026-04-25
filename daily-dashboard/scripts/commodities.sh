@@ -23,6 +23,12 @@ SYMBOLS = {
     "RB=F": "rb.f",     # Benzin RBOB Futures
     "ZW=F": "w.f",      # Weizen Futures
     "ZC=F": "c.f",      # Mais Futures
+    "ZS=F": "s.f",      # Sojabohnen Futures
+    "KC=F": "kc.f",     # Kaffee Futures
+    "CC=F": "cc.f",     # Kakao Futures
+    "SB=F": "sb.f",     # Zucker Futures
+    "CT=F": "ct.f",     # Baumwolle Futures
+    "OJ=F": "oj.f",     # Orangensaft Futures
 }
 
 def fetch(yahoo_sym):

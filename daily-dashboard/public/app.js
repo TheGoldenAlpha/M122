@@ -170,6 +170,12 @@ const COMMODITY_META = {
   "RB=F": { emoji: "⛽", name: "Benzin (RBOB)",   cat: "energie", unit: "USD/gal" },
   "ZW=F": { emoji: "🌾", name: "Weizen",          cat: "agrar",   unit: "ct/bu" },
   "ZC=F": { emoji: "🌽", name: "Mais",            cat: "agrar",   unit: "ct/bu" },
+  "ZS=F": { emoji: "🌱", name: "Sojabohnen",      cat: "agrar",   unit: "ct/bu" },
+  "KC=F": { emoji: "☕", name: "Kaffee",           cat: "agrar",   unit: "ct/lb" },
+  "CC=F": { emoji: "🍫", name: "Kakao",           cat: "agrar",   unit: "USD/t" },
+  "SB=F": { emoji: "🍬", name: "Zucker",          cat: "agrar",   unit: "ct/lb" },
+  "CT=F": { emoji: "🧵", name: "Baumwolle",       cat: "agrar",   unit: "ct/lb" },
+  "OJ=F": { emoji: "🍊", name: "Orangensaft",     cat: "agrar",   unit: "ct/lb" },
 };
 
 const COMMODITY_CATS = [
