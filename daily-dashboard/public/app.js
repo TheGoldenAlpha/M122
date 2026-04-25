@@ -123,12 +123,9 @@ async function loadNews() {
 async function loadCrypto() {
   try {
     const c = await loadJson("../data/crypto.json");
-    document.getElementById("ovBtc").textContent  = formatPrice(c.bitcoin_chf);
-    document.getElementById("ovEth").textContent  = formatPrice(c.ethereum_chf);
-    document.getElementById("ovSol").textContent  = formatPrice(c.solana_chf);
-    document.getElementById("detBtc").textContent = formatPrice(c.bitcoin_chf);
-    document.getElementById("detEth").textContent = formatPrice(c.ethereum_chf);
-    document.getElementById("detSol").textContent = formatPrice(c.solana_chf);
+    document.getElementById("ovBtc").textContent = formatPrice(c.bitcoin_chf);
+    document.getElementById("ovEth").textContent = formatPrice(c.ethereum_chf);
+    document.getElementById("ovSol").textContent = formatPrice(c.solana_chf);
   } catch {
     ["ovBtc","ovEth","ovSol"].forEach(id => document.getElementById(id).textContent = "–");
   }
@@ -141,6 +138,83 @@ async function refreshData() {
   btn.classList.remove("spinning");
   document.getElementById("lastUpdate").textContent =
     "Aktualisiert: " + new Date().toLocaleTimeString("de-CH");
+}
+
+// ── Rohstoffe ──
+
+const COMMODITY_META = {
+  "GC=F": { emoji: "🥇", name: "Gold",           cat: "metalle", unit: "USD/oz" },
+  "SI=F": { emoji: "🥈", name: "Silber",          cat: "metalle", unit: "USD/oz" },
+  "PL=F": { emoji: "💎", name: "Platin",          cat: "metalle", unit: "USD/oz" },
+  "PA=F": { emoji: "⚪", name: "Palladium",       cat: "metalle", unit: "USD/oz" },
+  "HG=F": { emoji: "🔶", name: "Kupfer",          cat: "metalle", unit: "USD/lb" },
+  "CL=F": { emoji: "🛢️", name: "Rohöl (WTI)",    cat: "energie", unit: "USD/bbl" },
+  "BZ=F": { emoji: "🛢️", name: "Rohöl (Brent)",  cat: "energie", unit: "USD/bbl" },
+  "NG=F": { emoji: "🔥", name: "Erdgas",          cat: "energie", unit: "USD/MMBtu" },
+  "RB=F": { emoji: "⛽", name: "Benzin (RBOB)",   cat: "energie", unit: "USD/gal" },
+  "ZW=F": { emoji: "🌾", name: "Weizen",          cat: "agrar",   unit: "ct/bu" },
+  "ZC=F": { emoji: "🌽", name: "Mais",            cat: "agrar",   unit: "ct/bu" },
+};
+
+const COMMODITY_CATS = [
+  { key: "energie", label: "Energie",     emoji: "⚡" },
+  { key: "metalle", label: "Edelmetalle", emoji: "🥇" },
+  { key: "agrar",   label: "Agrar",       emoji: "🌾" },
+];
+
+let commoditiesData = [];
+
+function formatCommodityPrice(val, symbol) {
+  const n = parseFloat(val);
+  if (isNaN(n)) return "–";
+  if (symbol === "RB=F") return n.toFixed(4);
+  if (symbol === "NG=F") return n.toFixed(3);
+  if (symbol === "HG=F") return n.toFixed(4);
+  if (n >= 1000) return n.toLocaleString("de-CH", { maximumFractionDigits: 1 });
+  if (n >= 10)   return n.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toFixed(4);
+}
+
+function renderCommodities() {
+  const el = document.getElementById("commodityContent");
+  if (!commoditiesData.length) {
+    el.innerHTML = '<div class="commodity-loading">Rohstoffdaten nicht verfügbar. <code>bash scripts/update.sh</code> ausführen.</div>';
+    return;
+  }
+  let html = "";
+  for (const cat of COMMODITY_CATS) {
+    const items = commoditiesData.filter(c => COMMODITY_META[c.symbol]?.cat === cat.key);
+    if (!items.length) continue;
+    html += `<div class="commodity-cat-block">
+      <div class="commodity-cat-header">
+        <span class="commodity-cat-emoji">${cat.emoji}</span>${cat.label}
+      </div>
+      <div class="commodity-grid">`;
+    for (const c of items) {
+      const meta = COMMODITY_META[c.symbol];
+      const up = c.changePercent >= 0;
+      html += `
+        <div class="commodity-card">
+          <div class="commodity-emoji-wrap ${cat.key}">${meta.emoji}</div>
+          <div class="commodity-name">${meta.name}</div>
+          <div class="commodity-price">${formatCommodityPrice(c.price, c.symbol)}</div>
+          <div class="commodity-unit">${meta.unit}</div>
+          <span class="commodity-change ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${Math.abs(c.changePercent).toFixed(2)}%</span>
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+async function loadCommodities() {
+  try {
+    commoditiesData = await loadJson("../data/commodities.json");
+    renderCommodities();
+  } catch {
+    document.getElementById("commodityContent").innerHTML =
+      '<div class="commodity-loading">Rohstoffdaten nicht verfügbar. <code>bash scripts/update.sh</code> ausführen.</div>';
+  }
 }
 
 // ── Aktien ──
@@ -436,10 +510,11 @@ function setupNav() {
       document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(btn.dataset.section).classList.add("active");
-      if (btn.dataset.section === "wetter") loadWeatherDetail();
-      if (btn.dataset.section === "sport")   loadSport();
-      if (btn.dataset.section === "aktien") loadStocks();
-      if (btn.dataset.section === "coins")  loadCoins();
+      if (btn.dataset.section === "wetter")    loadWeatherDetail();
+      if (btn.dataset.section === "sport")     loadSport();
+      if (btn.dataset.section === "rohstoffe") loadCommodities();
+      if (btn.dataset.section === "aktien")    loadStocks();
+      if (btn.dataset.section === "coins")     loadCoins();
     });
   });
 
