@@ -19,7 +19,7 @@ echo  [3/3] Server starten...
 start "" wsl -e bash -c "cd /mnt/c/Users/flori/Desktop/Module/M122/AllMyDay/daily-dashboard && python3 -m http.server 8347 --bind 127.0.0.1"
 timeout /t 2 /nobreak >nul
 
-start http://localhost:8347
+start http://localhost:8347/public/
 echo  Browser geoeffnet. Server laeuft.
 echo  Dieses Fenster offen lassen (Server laeuft darin).
 echo.
