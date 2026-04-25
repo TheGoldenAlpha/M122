@@ -10,9 +10,15 @@ python3 - << 'PYEOF' > "$TMP_FILE"
 import urllib.request, json, sys, time
 
 SYMBOLS = (
-    "AAPL,MSFT,NVDA,GOOGL,AMZN,META,TSLA,BRK-B,JPM,V,"
+    # US Tech / Wachstum
+    "AAPL,NVDA,MSFT,GOOGL,AMZN,META,TSLA,TSM,AVGO,LLY,"
+    "ORCL,NFLX,AMD,CRM,"
+    # US Finanzen / Konsum / Energie
+    "BRK-B,JPM,V,MA,WMT,XOM,COST,HD,UNH,PG,JNJ,BAC,KO,MCD,DIS,NVO,"
+    # Schweiz
     "NESN.SW,NOVN.SW,ROG.SW,ABBN.SW,UBSG.SW,"
-    "ASML.AS,SAP.DE,MC.PA"
+    # Europa
+    "ASML.AS,SAP.DE,MC.PA,OR.PA,SIE.DE"
 )
 
 HEADERS = {

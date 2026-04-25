@@ -220,24 +220,50 @@ async function loadCommodities() {
 // ── Aktien ──
 
 const STOCK_INFO = {
-  "AAPL":    { desc: "Apple entwickelt iPhones, Macs, iPads und Dienste wie iCloud und den App Store. Das Unternehmen ist bekannt für sein geschlossenes Ökosystem und gilt als wertvollstes Unternehmen der Welt.", sector: "Technologie · USA" },
-  "MSFT":    { desc: "Microsoft ist Hersteller von Windows und Office und betreibt mit Azure eine der grössten Cloud-Plattformen weltweit. Durch die Investition in OpenAI ist Microsoft führend in der KI-Integration.", sector: "Technologie · USA" },
-  "NVDA":    { desc: "NVIDIA ist führender Hersteller von Grafikprozessoren (GPUs) und gilt als zentraler Treiber der KI-Revolution. Nahezu jedes grosse KI-Modell wird auf NVIDIA-Hardware trainiert.", sector: "Halbleiter · USA" },
-  "GOOGL":   { desc: "Alphabet ist der Mutterkonzern von Google, YouTube und Waymo. Das Unternehmen dominiert den globalen Suchmarkt und investiert stark in KI, Cloud und autonomes Fahren.", sector: "Technologie · USA" },
-  "AMZN":    { desc: "Amazon ist der grösste Online-Händler der Welt und betreibt mit AWS die führende Cloud-Infrastruktur. Daneben wächst das Werbegeschäft stark.", sector: "E-Commerce / Cloud · USA" },
-  "META":    { desc: "Meta betreibt Facebook, Instagram und WhatsApp und erreicht täglich über 3 Milliarden Menschen. Das Unternehmen investiert stark in Virtual Reality und KI-Werbetechnologie.", sector: "Soziale Medien · USA" },
-  "TSLA":    { desc: "Tesla ist Pionier der Elektromobilität und produziert Elektroautos sowie Energiespeichersysteme. CEO Elon Musk prägt das Unternehmen stark – sowohl positiv als auch kontrovers.", sector: "Elektromobilität · USA" },
-  "BRK-B":   { desc: "Berkshire Hathaway ist das Investment-Konglomerat von Warren Buffett und hält grosse Beteiligungen an Apple, Coca-Cola und Bank of America. Gilt als einer der solidesten Langzeit-Investments.", sector: "Finanzen / Holding · USA" },
-  "JPM":     { desc: "JPMorgan Chase ist die grösste US-Bank nach Bilanzsumme und tätig in Investment Banking, Privatkundengeschäft und Asset Management. Gilt als 'fortress balance sheet'.", sector: "Banken · USA" },
-  "V":       { desc: "Visa betreibt das weltweit grösste Zahlungsnetzwerk für Kredit- und Debitkarten. Das Unternehmen verarbeitet täglich Milliarden von Transaktionen und profitiert vom Wachstum des bargeldlosen Zahlens.", sector: "Finanztechnologie · USA" },
+  // ── US Technologie & Wachstum ──
+  "AAPL":    { desc: "Apple entwickelt iPhones, Macs, iPads und Dienste wie iCloud und den App Store. Bekannt für sein geschlossenes Ökosystem gilt Apple als wertvollstes Unternehmen der Welt.", sector: "Technologie · USA" },
+  "NVDA":    { desc: "NVIDIA ist führender Hersteller von KI-GPUs und gilt als zentraler Treiber der KI-Revolution. Nahezu jedes grosse KI-Modell – von ChatGPT bis Gemini – wird auf NVIDIA-Hardware trainiert.", sector: "Halbleiter · USA" },
+  "MSFT":    { desc: "Microsoft betreibt Windows, Office und Azure – eine der grössten Cloud-Plattformen weltweit. Durch die Milliarden-Investition in OpenAI ist Microsoft führend in der KI-Integration.", sector: "Technologie · USA" },
+  "GOOGL":   { desc: "Alphabet ist der Mutterkonzern von Google, YouTube, Android und Waymo. Das Unternehmen dominiert den globalen Suchmarkt und investiert stark in KI und autonomes Fahren.", sector: "Technologie · USA" },
+  "AMZN":    { desc: "Amazon ist der grösste Online-Händler der Welt und betreibt mit AWS die führende Cloud-Infrastruktur. Das rasant wachsende Werbegeschäft wird zur dritten grossen Einnahmequelle.", sector: "E-Commerce / Cloud · USA" },
+  "META":    { desc: "Meta betreibt Facebook, Instagram und WhatsApp und erreicht täglich über 3 Milliarden Menschen. Das Unternehmen investiert massiv in KI-Werbetechnologie und Virtual Reality (Meta Quest).", sector: "Soziale Medien · USA" },
+  "TSLA":    { desc: "Tesla ist Pionier der Elektromobilität und produziert Elektroautos sowie Energiespeichersysteme. CEO Elon Musk prägt das Unternehmen stark, das auch an selbstfahrenden Robotaxis arbeitet.", sector: "Elektromobilität · USA" },
+  "TSM":     { desc: "TSMC ist der weltgrösste Auftragschiphersteller und fertigt die Chips von Apple, NVIDIA, AMD und vielen anderen. Ohne TSMC würde ein Grossteil der Technologiewelt stillstehen.", sector: "Halbleiter · Taiwan" },
+  "AVGO":    { desc: "Broadcom entwickelt Halbleiter und Infrastruktursoftware für Netzwerke, Rechenzentren und KI. Nach der VMware-Übernahme 2023 ist Broadcom auch im Enterprise-Software-Markt führend.", sector: "Halbleiter / Software · USA" },
+  "LLY":     { desc: "Eli Lilly ist ein US-Pharmariese und bekannt für seine Diabetes- und Abnehmmedikamente wie Mounjaro und Zepbound. Das Unternehmen verzeichnet aussergewöhnliches Wachstum im GLP-1-Markt.", sector: "Pharma · USA" },
+  "ORCL":    { desc: "Oracle ist weltführend in Unternehmensdatenbanken und Cloud-Infrastruktur. Im KI-Zeitalter baut Oracle massiv Rechenzentren aus und profitiert stark von der Nachfrage nach Cloud-Kapazitäten.", sector: "Software / Cloud · USA" },
+  "NFLX":    { desc: "Netflix ist der grösste Streaming-Dienst der Welt mit über 300 Millionen Abonnenten. Das Unternehmen investiert Milliarden in Eigenproduktionen und expandiert in Werbefinanzierung und Gaming.", sector: "Streaming · USA" },
+  "AMD":     { desc: "AMD entwickelt Prozessoren (Ryzen, EPYC) und KI-Grafikkarten (Instinct MI-Serie) als wichtigste Alternative zu NVIDIA. AMD gewinnt kontinuierlich Marktanteile in Rechenzentren.", sector: "Halbleiter · USA" },
+  "CRM":     { desc: "Salesforce ist der weltgrösste Anbieter von CRM-Software und hilft Unternehmen, ihre Kundenbeziehungen digital zu verwalten. Salesforce integriert KI-Agenten direkt in den Verkaufsprozess.", sector: "Software · USA" },
+  // ── US Finanzen / Konsum / Energie ──
+  "BRK-B":   { desc: "Berkshire Hathaway ist das Investment-Konglomerat von Warren Buffett mit Beteiligungen an Apple, Coca-Cola und BNSF Railway. Gilt weltweit als Inbegriff des soliden Langzeit-Investments.", sector: "Finanzen / Holding · USA" },
+  "JPM":     { desc: "JPMorgan Chase ist die grösste US-Bank nach Bilanzsumme und tätig in Investment Banking, Privatkundengeschäft und Asset Management. CEO Jamie Dimon gilt als einflussreichster Banker weltweit.", sector: "Banken · USA" },
+  "V":       { desc: "Visa betreibt das weltweit grösste Zahlungsnetzwerk für Kredit- und Debitkarten und verarbeitet täglich Milliarden Transaktionen. Visa profitiert strukturell vom weltweiten Trend zu bargeldlosem Zahlen.", sector: "Zahlungstechnologie · USA" },
+  "MA":      { desc: "Mastercard ist das zweitgrösste globale Zahlungsnetzwerk und direkte Konkurrenz zu Visa. Das Unternehmen verdient an jeder Transaktion eine kleine Gebühr – bei Milliarden Transaktionen täglich.", sector: "Zahlungstechnologie · USA" },
+  "WMT":     { desc: "Walmart ist der grösste Einzelhändler der Welt nach Umsatz mit über 10'000 Filialen weltweit. Der Konzern baut sein E-Commerce- und Werbegeschäft massiv aus und wächst rasant in Indien (Flipkart).", sector: "Einzelhandel · USA" },
+  "XOM":     { desc: "ExxonMobil ist der grösste westliche Öl- und Gaskonzern und investiert trotz Energiewende in neue Förderprojekte. Das Unternehmen engagiert sich zunehmend in CO₂-Abscheidung und Lithiumförderung.", sector: "Energie · USA" },
+  "COST":    { desc: "Costco betreibt Mitglieder-Warenhäuser weltweit und ist bekannt für niedrige Preise und hohe Kundentreue. Die Mitgliedschaftsgebühren sind das eigentliche Geschäftsmodell – die Waren werden fast zum Selbstkostenpreis verkauft.", sector: "Einzelhandel · USA" },
+  "HD":      { desc: "Home Depot ist die grösste Baumarkt-Kette der Welt und profitiert vom Boom im US-Heimwerker- und Renovierungsmarkt. Das Unternehmen bedient sowohl Privatpersonen als auch professionelle Handwerker.", sector: "Einzelhandel · USA" },
+  "UNH":     { desc: "UnitedHealth ist das grösste US-Krankenversicherungsunternehmen und betreibt mit Optum auch einen führenden Gesundheitsdienstleister. Der Konzern bewegt jährlich Billionen von Dollar im US-Gesundheitssystem.", sector: "Krankenversicherung · USA" },
+  "PG":      { desc: "Procter & Gamble produziert Konsumgüter wie Pampers, Gillette, Ariel und Oral-B. Als globaler Markenartikelkonzern profitiert P&G von der robusten Nachfrage nach Haushaltsprodukten.", sector: "Konsumgüter · USA" },
+  "JNJ":     { desc: "Johnson & Johnson ist ein globaler Pharma- und Medizintechnikkonzern mit Fokus auf verschreibungspflichtige Medikamente und chirurgische Geräte. J&J ist für seine stabile Dividende bekannt.", sector: "Pharma / Medizintechnik · USA" },
+  "BAC":     { desc: "Bank of America ist die zweitgrösste US-Bank und bedient über 65 Millionen Kunden. Das Unternehmen profitiert überproportional von hohen Zinsen durch sein riesiges Einlagenportfolio.", sector: "Banken · USA" },
+  "KO":      { desc: "Coca-Cola ist der weltbekannte Getränkehersteller mit über 500 Marken in mehr als 200 Ländern. Das Unternehmen gilt als Paradebeispiel für eine Dividenden-Aktie mit jahrzehntelangem Wachstum.", sector: "Getränke · USA" },
+  "MCD":     { desc: "McDonald's ist die grösste Fast-Food-Kette der Welt mit fast 40'000 Restaurants. Das eigentliche Geschäftsmodell ist Immobilien: McDonald's besitzt die Grundstücke, auf denen die Restaurants stehen.", sector: "Gastronomie · USA" },
+  "DIS":     { desc: "Disney ist ein globaler Medien- und Unterhaltungskonzern mit Marken wie Marvel, Star Wars, Pixar und ESPN. Das Streaming-Geschäft Disney+ wächst stark, während die Freizeitpark-Sparte Rekordumsätze erzielt.", sector: "Medien / Unterhaltung · USA" },
+  "NVO":     { desc: "Novo Nordisk ist ein dänischer Pharmariese und weltweiter Marktführer bei GLP-1-Medikamenten gegen Diabetes und Übergewicht (Ozempic, Wegovy). Das Unternehmen verzeichnet eines der schnellsten Wachstümer in der Pharmabranche.", sector: "Pharma · Dänemark" },
+  // ── Schweiz ──
   "NESN.SW": { desc: "Nestlé ist der grösste Nahrungsmittelkonzern der Welt mit Marken wie Nescafé, KitKat, Maggi und Vittel. Das Unternehmen ist an der Schweizer Börse kotiert und zahlt seit Jahrzehnten Dividende.", sector: "Nahrungsmittel · Schweiz" },
-  "NOVN.SW": { desc: "Novartis ist ein Schweizer Pharmariese, spezialisiert auf innovative Medikamente und Gentherapien. Das Unternehmen investiert massiv in die Entwicklung von Krebstherapien und seltenen Krankheiten.", sector: "Pharma · Schweiz" },
+  "NOVN.SW": { desc: "Novartis ist ein Schweizer Pharmariese, spezialisiert auf innovative Medikamente und Gentherapien. Das Unternehmen investiert massiv in Krebstherapien und seltene Krankheiten.", sector: "Pharma · Schweiz" },
   "ROG.SW":  { desc: "Roche ist Weltführer in der Onkologie und Diagnostik und entwickelt Krebsmedikamente sowie diagnostische Tests. Der Konzern ist an der Schweizer Börse kotiert und sehr dividendenfreundlich.", sector: "Pharma · Schweiz" },
-  "ABBN.SW": { desc: "ABB ist ein Schweizer Elektrotechnik- und Automatisierungskonzern, tätig in Robotik, Energieeffizienz und industrieller Automatisierung. ABB beliefert Industrien weltweit mit Antriebstechnik.", sector: "Industrie · Schweiz" },
-  "UBSG.SW": { desc: "UBS ist die grösste Schweizer Bank und global führend im Vermögensverwaltungsgeschäft. Nach der Übernahme der Credit Suisse 2023 ist UBS noch bedeutsamer für die Schweizer Wirtschaft.", sector: "Banken · Schweiz" },
-  "ASML.AS": { desc: "ASML ist ein niederländischer Hersteller von EUV-Lithographiemaschinen – unverzichtbar für die Herstellung modernster Chips. Ohne ASML gibt es keine fortschrittlichen Halbleiter.", sector: "Halbleiter · Niederlande" },
-  "SAP.DE":  { desc: "SAP ist Europas grösster Softwarekonzern und führend in Enterprise-Resource-Planning (ERP). Tausende Grosskonzerne weltweit steuern ihre Geschäftsprozesse mit SAP-Software.", sector: "Software · Deutschland" },
-  "MC.PA":   { desc: "LVMH ist der weltgrösste Luxusgüterkonzern und besitzt Marken wie Louis Vuitton, Dior, Moët & Chandon, Hennessy und Bulgari. Das Unternehmen profitiert vom globalen Wachstum der Luxusnachfrage.", sector: "Luxusgüter · Frankreich" },
+  "ABBN.SW": { desc: "ABB ist ein Schweizer Elektrotechnik- und Automatisierungskonzern in Robotik, Energieeffizienz und industrieller Automatisierung. ABB beliefert Industrien weltweit mit Antriebstechnik.", sector: "Industrie · Schweiz" },
+  "UBSG.SW": { desc: "UBS ist die grösste Schweizer Bank und global führend im Vermögensverwaltungsgeschäft. Nach der Übernahme der Credit Suisse 2023 verwaltet UBS über 5 Billionen Dollar Kundenvermögen.", sector: "Banken · Schweiz" },
+  // ── Europa ──
+  "ASML.AS": { desc: "ASML ist ein niederländischer Hersteller von EUV-Lithographiemaschinen – unverzichtbar für die Herstellung modernster Chips. ASML ist das einzige Unternehmen weltweit, das diese Schlüsseltechnologie liefert.", sector: "Halbleiter · Niederlande" },
+  "SAP.DE":  { desc: "SAP ist Europas grösster Softwarekonzern und weltweiter Marktführer in Enterprise-Resource-Planning (ERP). Tausende Grosskonzerne steuern ihre Geschäftsprozesse mit SAP – der Wechsel zu Cloud-Abonnements treibt Wachstum.", sector: "Software · Deutschland" },
+  "MC.PA":   { desc: "LVMH ist der weltgrösste Luxusgüterkonzern mit Marken wie Louis Vuitton, Dior, Moët & Chandon, Hennessy und Bulgari. Das Unternehmen profitiert vom globalen Wachstum der Luxusnachfrage aus Asien und dem Nahen Osten.", sector: "Luxusgüter · Frankreich" },
+  "OR.PA":   { desc: "L'Oréal ist der weltgrösste Kosmetikkonzern mit Marken wie Lancôme, Maybelline, Garnier und Kérastase. Das Unternehmen ist in allen Preissegmenten vertreten und wächst stark in Asien und Nordafrika.", sector: "Kosmetik · Frankreich" },
+  "SIE.DE":  { desc: "Siemens ist ein deutscher Industriekonzern tätig in Automatisierung, digitaler Industrie, Smart Infrastructure und Mobilität. Siemens gilt als Rückgrat der industriellen Digitalisierung in Europa.", sector: "Industrie · Deutschland" },
 };
 
 const BROKERS = [
@@ -267,12 +293,17 @@ function formatMcap(mcap) {
   return (mcap / 1e6).toFixed(0) + " Mio.";
 }
 
+function cleanSymbol(sym) {
+  return sym.replace(/\.(SW|AS|DE|PA|CO)$/, "");
+}
+
 function renderStocksOverview() {
+  const sorted = [...stocksData].sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
   const up = s => s.changePercent >= 0;
-  document.getElementById("stocksGrid").innerHTML = stocksData.map(s => `
+  document.getElementById("stocksGrid").innerHTML = sorted.map(s => `
     <div class="stock-card" onclick="openStockDetail('${s.symbol}')">
       <div class="stock-card-top">
-        <span class="stock-card-symbol">${s.symbol.replace(".SW","").replace(".AS","").replace(".DE","").replace(".PA","")}</span>
+        <span class="stock-card-symbol">${cleanSymbol(s.symbol)}</span>
         <span class="stock-card-badge ${up(s) ? "up" : "down"}">${up(s) ? "▲" : "▼"} ${Math.abs(s.changePercent).toFixed(2)}%</span>
       </div>
       <div class="stock-card-name">${s.name}</div>
