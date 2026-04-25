@@ -7,71 +7,56 @@ OUT_FILE="$DATA_DIR/commodities.json"
 TMP_FILE="$DATA_DIR/commodities.tmp"
 
 python3 - << 'PYEOF' > "$TMP_FILE"
-import urllib.request, urllib.parse, json, sys, time, http.cookiejar
+import urllib.request, csv, io, json, sys
+from concurrent.futures import ThreadPoolExecutor
 
-SYMBOLS = ["GC=F","SI=F","PL=F","PA=F","HG=F","CL=F","BZ=F","NG=F","RB=F","ZW=F","ZC=F"]
-
-HEADERS = {
-    "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept":          "application/json,text/html,*/*;q=0.9",
-    "Accept-Language": "de-CH,de;q=0.9,en;q=0.8",
-    "Referer":         "https://finance.yahoo.com/",
+# Stooq-Symbole für Rohstoffe (Yahoo-Symbol → Stooq-Symbol)
+SYMBOLS = {
+    "GC=F": "xauusd",   # Gold (Spot USD/oz)
+    "SI=F": "xagusd",   # Silber (Spot USD/oz)
+    "PL=F": "xptusd",   # Platin (Spot)
+    "PA=F": "xpdusd",   # Palladium (Spot)
+    "HG=F": "hg.f",     # Kupfer Futures
+    "CL=F": "cl.f",     # Rohöl WTI Futures
+    "BZ=F": "co.f",     # Rohöl Brent Futures
+    "NG=F": "ng.f",     # Erdgas Futures
+    "RB=F": "rb.f",     # Benzin RBOB Futures
+    "ZW=F": "w.f",      # Weizen Futures
+    "ZC=F": "c.f",      # Mais Futures
 }
 
-# Session mit Cookie-Unterstützung
-cj = http.cookiejar.CookieJar()
-opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-
-# Yahoo-Homepage besuchen → Cookies holen
-try:
-    opener.open(urllib.request.Request("https://finance.yahoo.com/", headers=HEADERS), timeout=12)
-except Exception:
-    pass
-
-# Crumb holen
-crumb = ""
-for crumb_url in [
-    "https://query1.finance.yahoo.com/v1/test/getcrumb",
-    "https://query2.finance.yahoo.com/v1/test/getcrumb",
-]:
+def fetch(yahoo_sym):
+    stooq = SYMBOLS.get(yahoo_sym)
+    if not stooq:
+        return None
+    url = f"https://stooq.com/q/l/?s={stooq}&f=sd2t2ohlcv&h&e=csv"
     try:
-        with opener.open(urllib.request.Request(crumb_url, headers=HEADERS), timeout=10) as r:
-            crumb = r.read().decode().strip()
-        if crumb:
-            break
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=12) as r:
+            text = r.read().decode()
+        row = next(csv.DictReader(io.StringIO(text)), None)
+        if not row:
+            return None
+        close = float(row.get("Close") or 0)
+        open_ = float(row.get("Open") or 0)
+        if close == 0:
+            return None
+        ch  = round(close - open_, 4)
+        chp = round((ch / open_ * 100) if open_ else 0, 2)
+        return {
+            "symbol":        yahoo_sym,
+            "price":         round(close, 4),
+            "change":        ch,
+            "changePercent": chp,
+            "currency":      "USD",
+        }
     except Exception:
-        pass
+        return None
 
-symbols_str = urllib.parse.quote(",".join(SYMBOLS))
-fields = "regularMarketPrice,regularMarketChange,regularMarketChangePercent,currency,shortName"
-crumb_param = f"&crumb={urllib.parse.quote(crumb)}" if crumb else ""
+with ThreadPoolExecutor(max_workers=6) as ex:
+    results = [r for r in ex.map(fetch, SYMBOLS.keys()) if r]
 
-data = None
-for base in ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"]:
-    for ver in ["v8", "v7"]:
-        url = f"{base}/{ver}/finance/quote?symbols={symbols_str}&fields={fields}{crumb_param}"
-        try:
-            with opener.open(urllib.request.Request(url, headers=HEADERS), timeout=20) as r:
-                raw = json.loads(r.read())
-            quotes = raw.get("quoteResponse", {}).get("result", [])
-            if quotes:
-                data = quotes
-                break
-        except Exception:
-            time.sleep(1)
-    if data:
-        break
-
-if data:
-    results = []
-    for q in data:
-        results.append({
-            "symbol":        q.get("symbol", ""),
-            "price":         round(q.get("regularMarketPrice", 0) or 0, 4),
-            "change":        round(q.get("regularMarketChange", 0) or 0, 4),
-            "changePercent": round(q.get("regularMarketChangePercent", 0) or 0, 2),
-            "currency":      q.get("currency", "USD"),
-        })
+if results:
     print(json.dumps(results, ensure_ascii=False))
     sys.exit(0)
 else:
