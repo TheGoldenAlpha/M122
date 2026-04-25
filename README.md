@@ -1,2 +1,3 @@
 # M122
-Pr2 and Pr3
+
+Das ist unser 2.tes Projekt. Viel vergnügen beim anschauen!!!
