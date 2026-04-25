@@ -364,16 +364,39 @@ async function loadCoins() {
 
 // ── Sport ──
 
+const SPORT_META = {
+  fussball:       { emoji: "⚽", label: "Fussball" },
+  eishockey:      { emoji: "🏒", label: "Eishockey" },
+  unihockey:      { emoji: "🏑", label: "Unihockey" },
+  handball:       { emoji: "🤾", label: "Handball" },
+  tennis:         { emoji: "🎾", label: "Tennis" },
+  ski:            { emoji: "⛷️", label: "Ski Alpin" },
+  leichtathletik: { emoji: "🏃", label: "Leichtathletik" },
+  basketball:     { emoji: "🏀", label: "Basketball" },
+  formel1:        { emoji: "🏎️", label: "Formel 1" },
+  volleyball:     { emoji: "🏐", label: "Volleyball" },
+};
+
 let sportData = null;
 let activeSport = "fussball";
 
+function parseSportTitle(raw) {
+  const idx = raw.lastIndexOf(" - ");
+  if (idx > 10) return { title: raw.slice(0, idx), source: raw.slice(idx + 3) };
+  return { title: raw, source: "" };
+}
+
 function renderSportList(key) {
   activeSport = key;
-  document.querySelectorAll(".sport-cat").forEach(b =>
+  document.querySelectorAll(".sport-tile").forEach(b =>
     b.classList.toggle("active", b.dataset.sport === key));
 
+  const meta = SPORT_META[key] || { emoji: "🏅", label: key };
+  document.getElementById("sportEmoji").textContent = meta.emoji;
+  document.getElementById("sportTitle").textContent = meta.label;
+
   const list = document.getElementById("sportList");
-  if (!sportData) { list.innerHTML = '<div class="sport-empty">Lade...</div>'; return; }
+  if (!sportData) { list.innerHTML = '<div class="sport-loading">Lade...</div>'; return; }
 
   const items = sportData[key] || [];
   if (items.length === 0) {
@@ -381,13 +404,19 @@ function renderSportList(key) {
     return;
   }
 
-  list.innerHTML = items.map((item, i) => `
-    <a class="news-full-item" href="${item.url || '#'}" target="_blank" rel="noopener">
-      <span class="news-full-num">${i + 1}</span>
-      <span class="news-full-text">${item.title}</span>
-      <svg class="news-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-    </a>
-  `).join("");
+  list.innerHTML = items.map((item, i) => {
+    const { title, source } = parseSportTitle(item.title);
+    return `
+      <a class="sport-news-item" href="${item.url || '#'}" target="_blank" rel="noopener">
+        <span class="sport-news-num">${i + 1}</span>
+        <div class="sport-news-body">
+          <div class="sport-news-title-text">${title}</div>
+          ${source ? `<span class="sport-news-source">${source}</span>` : ""}
+        </div>
+        <svg class="sport-news-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+      </a>
+    `;
+  }).join("");
 }
 
 async function loadSport() {
@@ -414,7 +443,7 @@ function setupNav() {
     });
   });
 
-  document.querySelectorAll(".sport-cat").forEach(btn => {
+  document.querySelectorAll(".sport-tile").forEach(btn => {
     btn.addEventListener("click", () => renderSportList(btn.dataset.sport));
   });
 }

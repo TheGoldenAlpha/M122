@@ -174,22 +174,64 @@
   <!-- SPORT -->
   <section id="sport" class="section">
     <div class="section-title"><i data-lucide="trophy"></i> Sport</div>
-    <div class="sport-cats">
-      <button class="sport-cat active" data-sport="fussball"><i data-lucide="circle-dot"></i> Fussball</button>
-      <button class="sport-cat" data-sport="eishockey"><i data-lucide="snowflake"></i> Eishockey</button>
-      <button class="sport-cat" data-sport="unihockey"><i data-lucide="zap"></i> Unihockey</button>
-      <button class="sport-cat" data-sport="handball"><i data-lucide="hand"></i> Handball</button>
-      <button class="sport-cat" data-sport="tennis"><i data-lucide="activity"></i> Tennis</button>
-      <button class="sport-cat" data-sport="ski"><i data-lucide="mountain"></i> Ski</button>
-      <button class="sport-cat" data-sport="leichtathletik"><i data-lucide="timer"></i> Leichtathletik</button>
-      <button class="sport-cat" data-sport="basketball"><i data-lucide="circle"></i> Basketball</button>
-      <button class="sport-cat" data-sport="formel1"><i data-lucide="gauge"></i> Formel 1</button>
-      <button class="sport-cat" data-sport="volleyball"><i data-lucide="sun"></i> Volleyball</button>
-    </div>
-    <div class="card">
-      <div id="sportList" class="news-full-list">
-        <div style="padding:24px;color:var(--text-muted)">Lade Sportdaten...</div>
+    <div class="sport-layout">
+
+      <div class="sport-sidebar">
+        <button class="sport-tile active" data-sport="fussball">
+          <span class="sport-tile-emoji">⚽</span>
+          <span class="sport-tile-name">Fussball</span>
+        </button>
+        <button class="sport-tile" data-sport="eishockey">
+          <span class="sport-tile-emoji">🏒</span>
+          <span class="sport-tile-name">Eishockey</span>
+        </button>
+        <button class="sport-tile" data-sport="unihockey">
+          <span class="sport-tile-emoji">🏑</span>
+          <span class="sport-tile-name">Unihockey</span>
+        </button>
+        <button class="sport-tile" data-sport="handball">
+          <span class="sport-tile-emoji">🤾</span>
+          <span class="sport-tile-name">Handball</span>
+        </button>
+        <button class="sport-tile" data-sport="tennis">
+          <span class="sport-tile-emoji">🎾</span>
+          <span class="sport-tile-name">Tennis</span>
+        </button>
+        <button class="sport-tile" data-sport="ski">
+          <span class="sport-tile-emoji">⛷️</span>
+          <span class="sport-tile-name">Ski</span>
+        </button>
+        <button class="sport-tile" data-sport="leichtathletik">
+          <span class="sport-tile-emoji">🏃</span>
+          <span class="sport-tile-name">Leichtath.</span>
+        </button>
+        <button class="sport-tile" data-sport="basketball">
+          <span class="sport-tile-emoji">🏀</span>
+          <span class="sport-tile-name">Basketball</span>
+        </button>
+        <button class="sport-tile" data-sport="formel1">
+          <span class="sport-tile-emoji">🏎️</span>
+          <span class="sport-tile-name">Formel 1</span>
+        </button>
+        <button class="sport-tile" data-sport="volleyball">
+          <span class="sport-tile-emoji">🏐</span>
+          <span class="sport-tile-name">Volleyball</span>
+        </button>
       </div>
+
+      <div class="sport-content card">
+        <div class="sport-content-header" id="sportContentHeader">
+          <span class="sport-content-emoji" id="sportEmoji">⚽</span>
+          <div>
+            <div class="sport-content-title" id="sportTitle">Fussball</div>
+            <div class="sport-content-sub">Aktuelle Schlagzeilen</div>
+          </div>
+        </div>
+        <div id="sportList" class="sport-news-list">
+          <div class="sport-loading">Lade Sportdaten...</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
