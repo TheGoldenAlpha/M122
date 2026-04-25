@@ -120,14 +120,6 @@ async function loadNews() {
   }
 }
 
-function formatPrice(val) {
-  const n = parseFloat(val);
-  if (isNaN(n)) return "–";
-  if (n >= 10000) return n.toLocaleString("de-CH", { maximumFractionDigits: 0 });
-  if (n >= 100)   return n.toLocaleString("de-CH", { maximumFractionDigits: 0 });
-  return n.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
 async function loadCrypto() {
   try {
     const c = await loadJson("../data/crypto.json");
@@ -183,8 +175,15 @@ const BROKERS = [
 
 let stocksData = [];
 
-function formatPrice(val, decimals = 2) {
-  return val.toLocaleString("de-CH", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+function formatPrice(val, decimals = null) {
+  const n = parseFloat(val);
+  if (isNaN(n)) return "–";
+  if (decimals !== null) {
+    return n.toLocaleString("de-CH", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+  if (Math.abs(n) >= 10000) return n.toLocaleString("de-CH", { maximumFractionDigits: 0 });
+  if (Math.abs(n) >= 100)   return n.toLocaleString("de-CH", { maximumFractionDigits: 0 });
+  return n.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatMcap(mcap) {
@@ -203,8 +202,8 @@ function renderStocksOverview() {
         <span class="stock-card-badge ${up(s) ? "up" : "down"}">${up(s) ? "▲" : "▼"} ${Math.abs(s.changePercent).toFixed(2)}%</span>
       </div>
       <div class="stock-card-name">${s.name}</div>
-      <div class="stock-card-price">${formatPrice(s.price)} <span class="stock-card-cur">${s.currency}</span></div>
-      <div class="stock-card-change ${up(s) ? "up" : "down"}">${up(s) ? "+" : ""}${formatPrice(s.change)}</div>
+      <div class="stock-card-price">${formatPrice(s.price, 2)} <span class="stock-card-cur">${s.currency}</span></div>
+      <div class="stock-card-change ${up(s) ? "up" : "down"}">${up(s) ? "+" : ""}${formatPrice(s.change, 2)}</div>
     </div>
   `).join("");
 }
@@ -218,12 +217,12 @@ function openStockDetail(symbol) {
   document.getElementById("detSymbol").textContent = symbol;
   document.getElementById("detName").textContent = s.name;
   document.getElementById("detSector").textContent = info.sector;
-  document.getElementById("detPrice").textContent = formatPrice(s.price) + " " + s.currency;
-  document.getElementById("detChange").textContent = (up ? "▲ +" : "▼ ") + formatPrice(s.change) + " (" + (up ? "+" : "") + s.changePercent.toFixed(2) + "%)";
+  document.getElementById("detPrice").textContent = formatPrice(s.price, 2) + " " + s.currency;
+  document.getElementById("detChange").textContent = (up ? "▲ +" : "▼ ") + formatPrice(s.change, 2) + " (" + (up ? "+" : "") + s.changePercent.toFixed(2) + "%)";
   document.getElementById("detChange").className = "stock-detail-change " + (up ? "up" : "down");
-  document.getElementById("detOpen").textContent  = formatPrice(s.open)  + " " + s.currency;
-  document.getElementById("detHigh").textContent  = formatPrice(s.high)  + " " + s.currency;
-  document.getElementById("detLow").textContent   = formatPrice(s.low)   + " " + s.currency;
+  document.getElementById("detOpen").textContent  = formatPrice(s.open, 2)  + " " + s.currency;
+  document.getElementById("detHigh").textContent  = formatPrice(s.high, 2)  + " " + s.currency;
+  document.getElementById("detLow").textContent   = formatPrice(s.low, 2)   + " " + s.currency;
   document.getElementById("detMcap").textContent  = formatMcap(s.marketCap) + " " + s.currency;
   document.getElementById("detDesc").textContent  = info.desc;
 
