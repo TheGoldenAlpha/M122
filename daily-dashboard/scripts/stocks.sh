@@ -7,49 +7,66 @@ OUT_FILE="$DATA_DIR/stocks.json"
 TMP_FILE="$DATA_DIR/stocks.tmp"
 
 python3 - << 'PYEOF' > "$TMP_FILE"
-import urllib.request, json, sys, time
+import urllib.request, urllib.parse, json, sys, time, http.cookiejar
 
-SYMBOLS = (
-    # US Tech / Wachstum
-    "AAPL,NVDA,MSFT,GOOGL,AMZN,META,TSLA,TSM,AVGO,LLY,"
-    "ORCL,NFLX,AMD,CRM,"
-    # US Finanzen / Konsum / Energie
-    "BRK-B,JPM,V,MA,WMT,XOM,COST,HD,UNH,PG,JNJ,BAC,KO,MCD,DIS,NVO,"
-    # Schweiz
-    "NESN.SW,NOVN.SW,ROG.SW,ABBN.SW,UBSG.SW,"
-    # Europa
-    "ASML.AS,SAP.DE,MC.PA,OR.PA,SIE.DE"
-)
+SYMBOLS = [
+    "AAPL","NVDA","MSFT","GOOGL","AMZN","META","TSLA","TSM","AVGO","LLY",
+    "ORCL","NFLX","AMD","CRM",
+    "BRK-B","JPM","V","MA","WMT","XOM","COST","HD","UNH","PG","JNJ","BAC","KO","MCD","DIS","NVO",
+    "NESN.SW","NOVN.SW","ROG.SW","ABBN.SW","UBSG.SW",
+    "ASML.AS","SAP.DE","MC.PA","OR.PA","SIE.DE",
+]
 
 HEADERS = {
-    "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept":          "application/json",
+    "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept":          "application/json,text/html,*/*;q=0.9",
     "Accept-Language": "de-CH,de;q=0.9,en;q=0.8",
     "Referer":         "https://finance.yahoo.com/",
 }
 
-ENDPOINTS = [
-    "https://query1.finance.yahoo.com/v7/finance/quote?symbols=" + SYMBOLS
-    + "&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent,"
-    + "regularMarketOpen,regularMarketDayHigh,regularMarketDayLow,marketCap,currency,shortName",
+# Session mit Cookie-Unterstützung
+cj = http.cookiejar.CookieJar()
+opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
 
-    "https://query2.finance.yahoo.com/v7/finance/quote?symbols=" + SYMBOLS
-    + "&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent,"
-    + "regularMarketOpen,regularMarketDayHigh,regularMarketDayLow,marketCap,currency,shortName",
-]
+# Yahoo-Homepage besuchen → Cookies holen
+try:
+    opener.open(urllib.request.Request("https://finance.yahoo.com/", headers=HEADERS), timeout=12)
+except Exception:
+    pass
 
-data = None
-for url in ENDPOINTS:
+# Crumb holen
+crumb = ""
+for crumb_url in [
+    "https://query1.finance.yahoo.com/v1/test/getcrumb",
+    "https://query2.finance.yahoo.com/v1/test/getcrumb",
+]:
     try:
-        req = urllib.request.Request(url, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=20) as r:
-            raw = json.loads(r.read())
-        quotes = raw.get("quoteResponse", {}).get("result", [])
-        if quotes:
-            data = quotes
+        with opener.open(urllib.request.Request(crumb_url, headers=HEADERS), timeout=10) as r:
+            crumb = r.read().decode().strip()
+        if crumb:
             break
     except Exception:
-        time.sleep(1)
+        pass
+
+symbols_str = urllib.parse.quote(",".join(SYMBOLS))
+fields = "regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketOpen,regularMarketDayHigh,regularMarketDayLow,marketCap,currency,shortName"
+crumb_param = f"&crumb={urllib.parse.quote(crumb)}" if crumb else ""
+
+data = None
+for base in ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"]:
+    for ver in ["v8", "v7"]:
+        url = f"{base}/{ver}/finance/quote?symbols={symbols_str}&fields={fields}{crumb_param}"
+        try:
+            with opener.open(urllib.request.Request(url, headers=HEADERS), timeout=20) as r:
+                raw = json.loads(r.read())
+            quotes = raw.get("quoteResponse", {}).get("result", [])
+            if quotes:
+                data = quotes
+                break
+        except Exception:
+            time.sleep(1)
+    if data:
+        break
 
 if data:
     results = []
