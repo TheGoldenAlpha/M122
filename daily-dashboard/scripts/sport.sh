@@ -37,12 +37,14 @@ def fetch_sport(key_query):
             xml_data = r.read()
         root = ET.fromstring(xml_data)
         items = []
-        for item in root.findall("./channel/item")[:10]:
+        for item in root.findall("./channel/item")[:15]:
             title = item.findtext("title", "").strip()
-            # Echte Artikel-URL aus der HTML-Description extrahieren
             desc  = html.unescape(item.findtext("description", ""))
-            match = re.search(r'href="(https?://[^"]+)"', desc)
-            link  = match.group(1) if match else item.findtext("link", "").strip()
+            # Alle hrefs extrahieren, ersten nehmen der NICHT google.com ist
+            hrefs = re.findall(r'href="(https?://[^"]+)"', desc)
+            link  = next((h for h in hrefs if "google.com" not in h), None)
+            if not link:
+                continue  # Kein direkter Link → Artikel überspringen
             if title:
                 items.append({"title": title, "url": link})
         return key, items
