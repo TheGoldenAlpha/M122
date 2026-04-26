@@ -300,7 +300,7 @@ const STOCK_INFO = {
 };
 
 const BROKERS = [
-  { name: "Swissquote",          url: "https://www.swissquote.ch" },
+  { name: "Swissquote",          url: "https://trade.swissquote.ch" },
   { name: "Interactive Brokers", url: "https://www.interactivebrokers.com" },
   { name: "DEGIRO",              url: "https://www.degiro.ch" },
   { name: "Neon Invest",         url: "https://www.neon-free.ch" },
@@ -412,7 +412,7 @@ const COIN_INFO = {
 };
 
 const CRYPTO_EXCHANGES = [
-  { name: "Swissquote Crypto", url: "https://www.swissquote.ch/trading/crypto.html" },
+  { name: "Swissquote Crypto", url: "https://trade.swissquote.ch" },
   { name: "Kraken",            url: "https://www.kraken.com" },
   { name: "Coinbase",          url: "https://www.coinbase.com" },
   { name: "Binance",           url: "https://www.binance.com" },
