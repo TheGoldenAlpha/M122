@@ -19,6 +19,13 @@
     </div>
     <div class="header-right">
       <span class="header-time" id="headerTime"></span>
+      <button class="theme-btn" onclick="toggleDarkMode()" title="Dark/Light Mode">
+        <i data-lucide="moon" class="icon-moon"></i>
+        <i data-lucide="sun"  class="icon-sun"></i>
+      </button>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" title="Menü">
+        <i data-lucide="menu"></i>
+      </button>
       <button class="refresh-btn" onclick="refreshData()" title="Aktualisieren">
         <i data-lucide="refresh-cw"></i>
       </button>
@@ -381,6 +388,53 @@
 <footer class="footer">
   <span id="lastUpdate">–</span>
 </footer>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Mobile Sidebar -->
+<aside class="mobile-sidebar" id="mobileSidebar">
+  <div class="sidebar-head">
+    <span class="sidebar-brand">All My Day</span>
+    <button class="sidebar-close" onclick="closeSidebar()"><i data-lucide="x"></i></button>
+  </div>
+  <div class="sidebar-theme">
+    <span class="sidebar-theme-label">
+      <i data-lucide="moon"></i>Dark Mode
+    </span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="darkToggleSidebar" onchange="toggleDarkMode()">
+      <span class="toggle-track"></span>
+      <span class="toggle-thumb"></span>
+    </label>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-nav-btn active" data-section="overview" onclick="sidebarNav('overview')">
+      <i data-lucide="layout-dashboard"></i>Übersicht
+    </button>
+    <button class="sidebar-nav-btn" data-section="wetter" onclick="sidebarNav('wetter')">
+      <i data-lucide="cloud-sun"></i>Wetter
+    </button>
+    <button class="sidebar-nav-btn" data-section="zeitung" onclick="sidebarNav('zeitung')">
+      <i data-lucide="newspaper"></i>Zeitung
+    </button>
+    <button class="sidebar-nav-btn" data-section="sport" onclick="sidebarNav('sport')">
+      <i data-lucide="trophy"></i>Sport
+    </button>
+    <button class="sidebar-nav-btn" data-section="rohstoffe" onclick="sidebarNav('rohstoffe')">
+      <i data-lucide="gem"></i>Rohstoffe
+    </button>
+    <button class="sidebar-nav-btn" data-section="aktien" onclick="sidebarNav('aktien')">
+      <i data-lucide="trending-up"></i>Aktien
+    </button>
+    <button class="sidebar-nav-btn" data-section="coins" onclick="sidebarNav('coins')">
+      <i data-lucide="bitcoin"></i>Coins
+    </button>
+    <button class="sidebar-nav-btn" data-section="entertainment" onclick="sidebarNav('entertainment')">
+      <i data-lucide="film"></i>Entertainment
+    </button>
+  </nav>
+</aside>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="app.js"></script>

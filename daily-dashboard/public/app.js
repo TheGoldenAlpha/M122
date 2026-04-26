@@ -167,6 +167,7 @@ const COMMODITY_META = {
   "PL=F": { emoji: "💎", name: "Platin",          cat: "metalle", unit: "USD/oz" },
   "PA=F": { emoji: "⚪", name: "Palladium",       cat: "metalle", unit: "USD/oz" },
   "HG=F": { emoji: "🔶", name: "Kupfer",          cat: "metalle", unit: "USD/lb" },
+  "ELEC_EU": { emoji: "⚡", name: "Strom (Day-Ahead)", cat: "energie", unit: "EUR/MWh" },
   "CL=F": { emoji: "🛢️", name: "Rohöl (WTI)",    cat: "energie", unit: "USD/bbl" },
   "BZ=F": { emoji: "🛢️", name: "Rohöl (Brent)",  cat: "energie", unit: "USD/bbl" },
   "NG=F": { emoji: "🔥", name: "Erdgas",          cat: "energie", unit: "USD/MMBtu" },
@@ -192,6 +193,7 @@ let commoditiesData = [];
 function formatCommodityPrice(val, symbol) {
   const n = parseFloat(val);
   if (isNaN(n)) return "–";
+  if (symbol === "ELEC_EU") return n.toLocaleString("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   if (symbol === "RB=F") return n.toFixed(4);
   if (symbol === "NG=F") return n.toFixed(3);
   if (symbol === "HG=F") return n.toFixed(4);
@@ -567,6 +569,55 @@ async function loadSport() {
   }
 }
 
+// ── Dark Mode ──
+function initDarkMode() {
+  const saved = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (saved === "dark" || (!saved && prefersDark)) {
+    document.body.classList.add("dark");
+    const cb = document.getElementById("darkToggleSidebar");
+    if (cb) cb.checked = true;
+  }
+}
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  const cb = document.getElementById("darkToggleSidebar");
+  if (cb) cb.checked = isDark;
+}
+
+// ── Mobile Sidebar ──
+function openSidebar() {
+  document.getElementById("mobileSidebar").classList.add("open");
+  document.getElementById("sidebarOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSidebar() {
+  document.getElementById("mobileSidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function sidebarNav(section) {
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  const topBtn = document.querySelector(`.nav-btn[data-section="${section}"]`);
+  if (topBtn) topBtn.classList.add("active");
+  document.getElementById(section).classList.add("active");
+  document.querySelectorAll(".sidebar-nav-btn").forEach(b => b.classList.remove("active"));
+  const sideBtn = document.querySelector(`.sidebar-nav-btn[data-section="${section}"]`);
+  if (sideBtn) sideBtn.classList.add("active");
+  if (section === "wetter")        loadWeatherDetail();
+  if (section === "sport")         loadSport();
+  if (section === "rohstoffe")     loadCommodities();
+  if (section === "aktien")        loadStocks();
+  if (section === "coins")         loadCoins();
+  if (section === "entertainment") loadEntertainment();
+  closeSidebar();
+}
+
 function setupNav() {
   document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -574,6 +625,9 @@ function setupNav() {
       document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(btn.dataset.section).classList.add("active");
+      document.querySelectorAll(".sidebar-nav-btn").forEach(b => b.classList.remove("active"));
+      const sideBtn = document.querySelector(`.sidebar-nav-btn[data-section="${btn.dataset.section}"]`);
+      if (sideBtn) sideBtn.classList.add("active");
       if (btn.dataset.section === "wetter")    loadWeatherDetail();
       if (btn.dataset.section === "sport")     loadSport();
       if (btn.dataset.section === "rohstoffe") loadCommodities();
@@ -637,6 +691,7 @@ function entArticleCard(item, fallbackEmoji) {
   "</a>";
 }
 
+initDarkMode();
 updateClock();
 setInterval(updateClock, 1000);
 setupNav();

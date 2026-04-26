@@ -59,8 +59,43 @@ def fetch(yahoo_sym):
     except Exception:
         return None
 
+def fetch_electricity():
+    # Day-Ahead Spotpreise CH, Fallback DE-LU (Fraunhofer ISE energy-charts.info)
+    for bzn in ["CH", "DE-LU"]:
+        try:
+            url = f"https://api.energy-charts.info/price?bzn={bzn}"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (AllMyDay Dashboard)"})
+            with urllib.request.urlopen(req, timeout=14) as r:
+                data = json.loads(r.read())
+            prices = data.get("price", [])
+            # Letzten nicht-None Preis nehmen
+            valid = [(p, i) for i, p in enumerate(prices) if p is not None]
+            if not valid:
+                continue
+            last_price, last_idx = valid[-1]
+            # Vortagespreis: gleiche Stunde gestern (24 Stunden zurück)
+            prev_idx = last_idx - 24
+            prev_price = prices[prev_idx] if prev_idx >= 0 and prices[prev_idx] is not None else None
+            ch  = round(last_price - prev_price, 2) if prev_price is not None else 0
+            chp = round((ch / prev_price * 100) if prev_price else 0, 2)
+            return {
+                "symbol":        "ELEC_EU",
+                "price":         round(last_price, 2),
+                "change":        ch,
+                "changePercent": chp,
+                "currency":      "EUR",
+                "source":        bzn,
+            }
+        except Exception:
+            continue
+    return None
+
 with ThreadPoolExecutor(max_workers=6) as ex:
     results = [r for r in ex.map(fetch, SYMBOLS.keys()) if r]
+
+elec = fetch_electricity()
+if elec:
+    results.append(elec)
 
 if results:
     print(json.dumps(results, ensure_ascii=False))
