@@ -46,6 +46,9 @@
     <button class="nav-btn" data-section="coins">
       <i data-lucide="bitcoin"></i><span>Coins</span>
     </button>
+    <button class="nav-btn" data-section="entertainment">
+      <i data-lucide="film"></i><span>Entertainment</span>
+    </button>
   </nav>
 </header>
 
@@ -354,6 +357,56 @@
     </div>
   </section>
 
+
+  <!-- ENTERTAINMENT -->
+  <section id="entertainment" class="section">
+    <div class="section-title"><i data-lucide="film"></i> Entertainment</div>
+
+    <!-- API-Key Setup -->
+    <div class="card ent-setup" id="entSetup">
+      <div class="ent-setup-icon">🔑</div>
+      <div class="ent-setup-title">API-Keys einrichten</div>
+      <div class="ent-setup-sub">Beide APIs sind kostenlos und brauchen eine einmalige Registrierung (je ca. 1 Minute).</div>
+      <div class="ent-keys-grid">
+        <div class="ent-key-block">
+          <div class="ent-key-label">🎬 TMDB API-Key
+            <a href="https://www.themoviedb.org/settings/api" target="_blank" class="ent-key-link">kostenlos holen →</a>
+          </div>
+          <input type="text" id="tmdbKey" class="ent-key-input" placeholder="z.B. abc123def456..." oninput="entSaveKeys()" />
+        </div>
+        <div class="ent-key-block">
+          <div class="ent-key-label">🎮 RAWG API-Key
+            <a href="https://rawg.io/apidocs" target="_blank" class="ent-key-link">kostenlos holen →</a>
+          </div>
+          <input type="text" id="rawgKey" class="ent-key-input" placeholder="z.B. abc123def456..." oninput="entSaveKeys()" />
+        </div>
+      </div>
+      <button class="ent-load-btn" onclick="entLoad()">Inhalte laden →</button>
+    </div>
+
+    <!-- Tab-Switcher -->
+    <div class="ent-tabs" id="entTabs" style="display:none;">
+      <button class="ent-tab active" data-tab="movies" onclick="entSwitchTab(this)">🎬 Filme</button>
+      <button class="ent-tab" data-tab="games" onclick="entSwitchTab(this)">🎮 Games</button>
+      <button class="ent-tab-settings" onclick="entToggleSetup()" title="API-Keys ändern"><i data-lucide="settings"></i></button>
+    </div>
+
+    <!-- Filme-Panel -->
+    <div class="ent-panel" id="ent-movies" style="display:none;">
+      <div class="ent-section-label">Demnächst im Kino</div>
+      <div class="ent-grid movie-grid" id="moviesGrid"><div class="ent-loading">Lade…</div></div>
+      <div class="ent-section-label" style="margin-top:36px;">Jetzt im Kino</div>
+      <div class="ent-grid movie-grid" id="nowPlayingGrid"><div class="ent-loading">Lade…</div></div>
+    </div>
+
+    <!-- Games-Panel -->
+    <div class="ent-panel" id="ent-games" style="display:none;">
+      <div class="ent-section-label">Erscheint demnächst</div>
+      <div class="ent-grid game-grid" id="upcomingGamesGrid"><div class="ent-loading">Lade…</div></div>
+      <div class="ent-section-label" style="margin-top:36px;">Kürzlich erschienen</div>
+      <div class="ent-grid game-grid" id="recentGamesGrid"><div class="ent-loading">Lade…</div></div>
+    </div>
+  </section>
 
 </main>
 
