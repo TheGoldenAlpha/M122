@@ -153,7 +153,7 @@ async function loadCrypto() {
 async function refreshData() {
   const btn = document.querySelector(".refresh-btn");
   btn.classList.add("spinning");
-  await Promise.all([loadWeather(), loadNews(), loadCrypto()]);
+  await Promise.all([loadWeather(), loadNews(), loadCrypto(), loadCommodities()]);
   btn.classList.remove("spinning");
   document.getElementById("lastUpdate").textContent =
     "Aktualisiert: " + new Date().toLocaleTimeString("de-CH");
@@ -236,6 +236,13 @@ async function loadCommodities() {
   try {
     commoditiesData = await loadJson("../data/commodities.json");
     window._commoditiesCache = commoditiesData;
+    // Übersicht-Karten befüllen
+    const gold   = commoditiesData.find(c => c.symbol === "GC=F");
+    const silver = commoditiesData.find(c => c.symbol === "SI=F");
+    const gEl = document.getElementById("ovGold");
+    const sEl = document.getElementById("ovSilver");
+    if (gEl && gold)   gEl.textContent   = formatPrice(gold.price, 0);
+    if (sEl && silver) sEl.textContent   = formatPrice(silver.price, 2);
     renderCommodities();
   } catch {
     document.getElementById("commodityContent").innerHTML =
@@ -572,199 +579,12 @@ function setupNav() {
       if (btn.dataset.section === "rohstoffe") loadCommodities();
       if (btn.dataset.section === "aktien")    loadStocks();
       if (btn.dataset.section === "coins")       loadCoins();
-      if (btn.dataset.section === "newsletter")  loadNewsletterSection();
     });
   });
 
   document.querySelectorAll(".sport-tile").forEach(btn => {
     btn.addEventListener("click", () => renderSportList(btn.dataset.sport));
   });
-}
-
-// ── Newsletter ──
-
-const SMTP = {
-  gmail:   { host: "smtp.gmail.com",        port: 587 },
-  icloud:  { host: "smtp.mail.me.com",       port: 587 },
-  outlook: { host: "smtp-mail.outlook.com",  port: 587 },
-};
-
-function nlProviderChange() {
-  nlSave();
-}
-
-function nlGetNlMsg() {
-  return document.getElementById("nlPreview").textContent;
-}
-
-function nlSave() {
-  const cfg = {
-    time:            document.getElementById("nlTime").value,
-    email_enabled:   document.getElementById("emailEnabled").checked,
-    email_from:      document.getElementById("emailFrom").value,
-    email_pass:      document.getElementById("emailPass").value,
-    email_to:        document.getElementById("emailTo").value,
-    email_provider:  document.getElementById("emailProvider").value,
-    tg_enabled:      document.getElementById("telegramEnabled").checked,
-    tg_token:        document.getElementById("tgToken").value,
-    tg_chat_id:      document.getElementById("tgChatId").value,
-  };
-  localStorage.setItem("nl_cfg", JSON.stringify(cfg));
-}
-
-function nlLoad() {
-  const raw = localStorage.getItem("nl_cfg");
-  if (!raw) return;
-  try {
-    const c = JSON.parse(raw);
-    if (c.time)           document.getElementById("nlTime").value           = c.time;
-    if (c.email_enabled)  document.getElementById("emailEnabled").checked   = c.email_enabled;
-    if (c.email_from)     document.getElementById("emailFrom").value        = c.email_from;
-    if (c.email_pass)     document.getElementById("emailPass").value        = c.email_pass;
-    if (c.email_to)       document.getElementById("emailTo").value          = c.email_to;
-    if (c.email_provider) document.getElementById("emailProvider").value    = c.email_provider;
-    if (c.tg_enabled)     document.getElementById("telegramEnabled").checked = c.tg_enabled;
-    if (c.tg_token)       document.getElementById("tgToken").value          = c.tg_token;
-    if (c.tg_chat_id)     document.getElementById("tgChatId").value         = c.tg_chat_id;
-  } catch {}
-}
-
-function nlStatus(id, ok, msg) {
-  const el = document.getElementById(id);
-  el.className = "nl-status " + (ok ? "ok" : "err");
-  el.textContent = (ok ? "✓ " : "✗ ") + msg;
-}
-
-function nlDownloadBat() {
-  const time    = document.getElementById("nlTime").value;
-  const script  = "/mnt/c/Users/flori/Desktop/Module/M122/AllMyDay/daily-dashboard/scripts/notify.sh";
-  const cfg     = {
-    time,
-    email_enabled:  document.getElementById("emailEnabled").checked,
-    email_from:     document.getElementById("emailFrom").value,
-    email_pass:     document.getElementById("emailPass").value,
-    email_to:       document.getElementById("emailTo").value,
-    smtp_host:      (SMTP[document.getElementById("emailProvider").value] || SMTP.gmail).host,
-    smtp_port:      (SMTP[document.getElementById("emailProvider").value] || SMTP.gmail).port,
-    tg_enabled:     document.getElementById("telegramEnabled").checked,
-    tg_token:       document.getElementById("tgToken").value,
-    tg_chat_id:     document.getElementById("tgChatId").value,
-  };
-
-  const cfgJson = JSON.stringify(cfg, null, 2).replace(/"/g, '\\"');
-  const bat = `@echo off
-echo Speichere Konfiguration...
-echo ${cfgJson} > "C:\\Users\\flori\\Desktop\\Module\\M122\\AllMyDay\\daily-dashboard\\data\\notify-config.json"
-echo Richte Windows Task ein...
-schtasks /create /tn "AllMyDay-Newsletter" /tr "wsl -e bash ${script}" /sc daily /st ${time} /f
-if %errorlevel%==0 (
-  echo.
-  echo Fertig! Newsletter wird taeglich um ${time} Uhr gesendet.
-) else (
-  echo Fehler - bitte als Administrator ausfuehren!
-)
-pause`;
-
-  const blob = new Blob([bat], { type: "text/plain" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "setup-newsletter.bat";
-  a.click();
-  nlStatus("nlStatus", true, "setup-newsletter.bat heruntergeladen! Als Administrator ausführen.");
-}
-
-async function nlTestEmail() {
-  const from  = document.getElementById("emailFrom").value.trim();
-  const pass  = document.getElementById("emailPass").value.trim();
-  const to    = document.getElementById("emailTo").value.trim();
-  if (!from || !pass || !to) {
-    nlStatus("emailStatus", false, "Bitte alle E-Mail-Felder ausfüllen."); return;
-  }
-  nlStatus("emailStatus", true, "Öffne Mail-Client mit Test-Nachricht…");
-  const body = encodeURIComponent(nlGetNlMsg());
-  const subj = encodeURIComponent("🌅 Guten Morgen – All My Day (Test)");
-  window.open(`mailto:${to}?subject=${subj}&body=${body}`);
-}
-
-async function nlGetChatId() {
-  const token = document.getElementById("tgToken").value.trim();
-  if (!token) { nlStatus("telegramStatus", false, "Erst Bot-Token eingeben."); return; }
-  nlStatus("telegramStatus", true, "Lade Chat-ID…");
-  try {
-    const r = await fetchWithTimeout(`https://api.telegram.org/bot${token}/getUpdates`, 8000);
-    const msg = r?.result?.[0]?.message;
-    if (msg?.chat?.id) {
-      document.getElementById("tgChatId").value = String(msg.chat.id);
-      nlSave();
-      nlStatus("telegramStatus", true, "Chat-ID gefunden: " + msg.chat.id);
-    } else {
-      nlStatus("telegramStatus", false, "Keine Nachricht gefunden. Schreib deinem Bot zuerst eine Nachricht, dann nochmals klicken.");
-    }
-  } catch {
-    nlStatus("telegramStatus", false, "Fehler beim Laden. Token korrekt?");
-  }
-}
-
-async function nlTestTelegram() {
-  const token  = document.getElementById("tgToken").value.trim();
-  const chatId = document.getElementById("tgChatId").value.trim();
-  if (!token || !chatId) { nlStatus("telegramStatus", false, "Token und Chat-ID ausfüllen."); return; }
-  nlStatus("telegramStatus", true, "Sende Test-Nachricht…");
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: nlGetNlMsg() }),
-    });
-    nlStatus("telegramStatus", true, "Test-Nachricht gesendet! Prüfe Telegram.");
-  } catch {
-    nlStatus("telegramStatus", false, "Fehler beim Senden.");
-  }
-}
-
-function nlBuildPreview() {
-  let temp = "–", wind = "–", rain = "–", headline = "–", btc = "–", gold = "–", silver = "–";
-  try {
-    if (window._weatherCache) {
-      temp = window._weatherCache.temperature + "°C";
-      wind = window._weatherCache.wind + " km/h";
-      rain = window._weatherCache.rain + " mm";
-    }
-  } catch {}
-  try {
-    const n = window._newsCache;
-    if (n?.items?.[0]) headline = n.items[0].title;
-  } catch {}
-  try {
-    if (window._cryptoCache) btc = Math.round(window._cryptoCache.bitcoin_chf).toLocaleString("de-CH") + " CHF";
-  } catch {}
-  try {
-    const c = window._commoditiesCache || [];
-    const g = c.find(x => x.symbol === "GC=F");
-    const s = c.find(x => x.symbol === "SI=F");
-    if (g) gold   = Math.round(g.price).toLocaleString("de-CH") + " USD/oz";
-    if (s) silver = s.price.toFixed(2) + " USD/oz";
-  } catch {}
-
-  document.getElementById("nlPreview").textContent =
-`🌅 Guten Morgen!
-
-🌤️ Wetter Zürich: ${temp} · ${wind} Wind · ${rain} Regen
-
-📰 Schlagzeile:
-${headline}
-
-💰 Märkte:
-🥇 Gold: ${gold}
-🥈 Silber: ${silver}
-₿ Bitcoin: ${btc}
-
-Ich wünsche dir einen schönen Tag! Bis morgen 😊`;
-}
-
-function loadNewsletterSection() {
-  nlLoad();
-  nlBuildPreview();
 }
 
 updateClock();

@@ -46,9 +46,6 @@
     <button class="nav-btn" data-section="coins">
       <i data-lucide="bitcoin"></i><span>Coins</span>
     </button>
-    <button class="nav-btn" data-section="newsletter">
-      <i data-lucide="bell"></i><span>Newsletter</span>
-    </button>
   </nav>
 </header>
 
@@ -103,20 +100,20 @@
           <div class="market-unit">CHF</div>
         </div>
       </div>
-      <div class="market-card disabled">
-        <div class="market-icon gas"><i data-lucide="flame"></i></div>
+      <div class="market-card">
+        <div class="market-icon gold"><i data-lucide="gem"></i></div>
         <div class="market-info">
-          <div class="market-name">Erdgas</div>
-          <div class="market-price">--</div>
-          <div class="market-unit">Bald</div>
+          <div class="market-name">Gold</div>
+          <div class="market-price" id="ovGold">--</div>
+          <div class="market-unit">USD/oz</div>
         </div>
       </div>
-      <div class="market-card disabled">
-        <div class="market-icon smi"><i data-lucide="bar-chart-2"></i></div>
+      <div class="market-card">
+        <div class="market-icon silver"><i data-lucide="sparkles"></i></div>
         <div class="market-info">
-          <div class="market-name">SMI</div>
-          <div class="market-price">--</div>
-          <div class="market-unit">Bald</div>
+          <div class="market-name">Silber</div>
+          <div class="market-price" id="ovSilver">--</div>
+          <div class="market-unit">USD/oz</div>
         </div>
       </div>
     </div>
@@ -357,128 +354,6 @@
     </div>
   </section>
 
-  <!-- NEWSLETTER -->
-  <section id="newsletter" class="section">
-    <div class="section-title"><i data-lucide="bell"></i> Morgen-Newsletter</div>
-
-    <div class="nl-layout">
-
-      <!-- VORSCHAU -->
-      <div class="card nl-preview-card">
-        <div class="nl-preview-title"><i data-lucide="eye"></i> Vorschau</div>
-        <div class="nl-preview-msg" id="nlPreview">🌅 Guten Morgen!
-
-🌤️ Wetter Zürich: wird geladen…
-
-📰 Schlagzeile:
-wird geladen…
-
-💰 Märkte:
-🥇 Gold: – USD/oz
-🥈 Silber: – USD/oz
-₿ Bitcoin: – CHF
-
-Ich wünsche dir einen schönen Tag! Bis morgen 😊</div>
-
-        <div class="nl-form-row" style="margin-top:16px;">
-          <label>Uhrzeit</label>
-          <select id="nlTime">
-            <option value="06:00">06:00 Uhr</option>
-            <option value="07:00" selected>07:00 Uhr</option>
-            <option value="08:00">08:00 Uhr</option>
-          </select>
-        </div>
-        <button class="nl-btn nl-btn-primary" style="margin-top:12px;width:100%;" onclick="nlDownloadBat()">
-          <i data-lucide="download"></i> Windows Task einrichten (.bat)
-        </button>
-        <div class="nl-status" id="nlStatus"></div>
-      </div>
-
-      <!-- METHODEN -->
-      <div class="nl-methods">
-
-        <!-- E-MAIL -->
-        <div class="card nl-method-card">
-          <div class="nl-method-header">
-            <span class="nl-method-icon email-icon"><i data-lucide="mail"></i></span>
-            <div>
-              <div class="nl-method-title">E-Mail</div>
-              <div class="nl-method-sub">Empfänger beliebig — Gmail, iCloud, Outlook</div>
-            </div>
-            <label class="nl-toggle">
-              <input type="checkbox" id="emailEnabled" onchange="nlSave()">
-              <span class="nl-toggle-slider"></span>
-            </label>
-          </div>
-          <div class="nl-form" id="emailForm">
-            <div class="nl-form-row">
-              <label>Absender</label>
-              <input type="email" id="emailFrom" placeholder="deine@gmail.com" oninput="nlSave()" />
-            </div>
-            <div class="nl-form-row">
-              <label>App-Passwort</label>
-              <input type="password" id="emailPass" placeholder="Gmail App-Passwort" oninput="nlSave()" />
-            </div>
-            <div class="nl-form-row">
-              <label>Senden an</label>
-              <input type="email" id="emailTo" placeholder="empfaenger@example.com" oninput="nlSave()" />
-            </div>
-            <div class="nl-form-row">
-              <label>Anbieter</label>
-              <select id="emailProvider" onchange="nlProviderChange()">
-                <option value="gmail">Gmail</option>
-                <option value="icloud">iCloud</option>
-                <option value="outlook">Outlook</option>
-              </select>
-            </div>
-            <div class="nl-hint">
-              Gmail: <a href="https://myaccount.google.com/apppasswords" target="_blank">App-Passwort erstellen →</a><br>
-              iCloud: <a href="https://appleid.apple.com/account/manage" target="_blank">App-spez. Passwort →</a>
-            </div>
-            <button class="nl-btn nl-btn-test" onclick="nlTestEmail()">
-              <i data-lucide="send"></i> Test-Mail senden
-            </button>
-            <div class="nl-status" id="emailStatus"></div>
-          </div>
-        </div>
-
-        <!-- TELEGRAM -->
-        <div class="card nl-method-card">
-          <div class="nl-method-header">
-            <span class="nl-method-icon telegram-icon">✈️</span>
-            <div>
-              <div class="nl-method-title">Telegram</div>
-              <div class="nl-method-sub">Gratis · Push wie iMessage</div>
-            </div>
-            <label class="nl-toggle">
-              <input type="checkbox" id="telegramEnabled" onchange="nlSave()">
-              <span class="nl-toggle-slider"></span>
-            </label>
-          </div>
-          <div class="nl-form" id="telegramForm">
-            <div class="nl-steps-mini">
-              <div class="nl-step-mini"><span>1</span> Telegram öffnen → <strong>@BotFather</strong> suchen → <code>/newbot</code> → Bot erstellen → Token kopieren</div>
-              <div class="nl-step-mini"><span>2</span> Deinen neuen Bot anschreiben → dann <strong>Chat-ID</strong> unten einfügen</div>
-            </div>
-            <div class="nl-form-row">
-              <label>Bot-Token</label>
-              <input type="text" id="tgToken" placeholder="123456:ABCdef..." oninput="nlSave()" />
-            </div>
-            <div class="nl-form-row">
-              <label>Chat-ID</label>
-              <input type="text" id="tgChatId" placeholder="Automatisch ermitteln →" readonly id="tgChatId" />
-              <button class="nl-btn nl-btn-secondary" style="white-space:nowrap;" onclick="nlGetChatId()">ID holen</button>
-            </div>
-            <button class="nl-btn nl-btn-test" onclick="nlTestTelegram()">
-              <i data-lucide="send"></i> Test-Nachricht senden
-            </button>
-            <div class="nl-status" id="telegramStatus"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
 </main>
 
