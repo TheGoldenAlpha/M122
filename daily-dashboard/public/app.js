@@ -590,33 +590,6 @@ function setupNav() {
 
 // ── Entertainment ──
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w342";
-
-function entLoadKeys() {
-  try {
-    const k = JSON.parse(localStorage.getItem("ent_keys") || "{}");
-    const t = document.getElementById("tmdbKey");
-    const r = document.getElementById("rawgKey");
-    if (t && k.tmdb) t.value = k.tmdb;
-    if (r && k.rawg) r.value = k.rawg;
-    return k;
-  } catch { return {}; }
-}
-
-function entSaveKeys() {
-  const k = {
-    tmdb: document.getElementById("tmdbKey")?.value.trim() || "",
-    rawg: document.getElementById("rawgKey")?.value.trim() || "",
-  };
-  localStorage.setItem("ent_keys", JSON.stringify(k));
-  return k;
-}
-
-function entToggleSetup() {
-  const s = document.getElementById("entSetup");
-  s.style.display = s.style.display === "none" ? "block" : "none";
-}
-
 function entSwitchTab(btn) {
   document.querySelectorAll(".ent-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
@@ -624,142 +597,42 @@ function entSwitchTab(btn) {
   document.getElementById("ent-" + btn.dataset.tab).style.display = "block";
 }
 
-function entDate(offset = 0) {
-  return new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
+async function loadEntertainment() {
+  try {
+    const data = await loadJson("../data/entertainment.json");
+    entRenderGrid("gamingGrid", data.gaming || [], "🎮");
+    entRenderGrid("moviesGrid", data.movies || [], "🎬");
+  } catch {
+    document.getElementById("gamingGrid").innerHTML =
+      '<div class="ent-error">Daten nicht verfügbar. <code>bash scripts/update.sh</code> ausführen.</div>';
+    document.getElementById("moviesGrid").innerHTML = "";
+  }
 }
 
-async function loadEntertainment() {
-  const k = entLoadKeys();
-  const setup = document.getElementById("entSetup");
-  const tabs  = document.getElementById("entTabs");
-
-  if (!k.tmdb && !k.rawg) {
-    setup.style.display = "block";
-    tabs.style.display  = "none";
+function entRenderGrid(gridId, items, fallbackEmoji) {
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  if (!items.length) {
+    el.innerHTML = '<div class="ent-empty">Keine Artikel gefunden.</div>';
     return;
   }
-
-  setup.style.display = "none";
-  tabs.style.display  = "flex";
-
-  // Aktives Panel anzeigen
-  const activeTab = document.querySelector(".ent-tab.active");
-  const tabId = activeTab ? activeTab.dataset.tab : "movies";
-  document.querySelectorAll(".ent-panel").forEach(p => p.style.display = "none");
-  document.getElementById("ent-" + tabId).style.display = "block";
-
-  if (k.tmdb) entLoadMovies(k.tmdb);
-  if (k.rawg) entLoadGames(k.rawg);
+  el.innerHTML = items.map(item => entArticleCard(item, fallbackEmoji)).join("");
 }
 
-async function entLoad() {
-  entSaveKeys();
-  loadEntertainment();
-}
-
-// ── Filme (TMDB) ──
-
-async function entLoadMovies(key) {
-  const setGrid = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  const spin = '<div class="ent-loading"><div class="ent-spinner"></div> Lade Filmdaten…</div>';
-  setGrid("moviesGrid", spin);
-  setGrid("nowPlayingGrid", spin);
-
-  try {
-    const [upcoming, nowPlaying] = await Promise.all([
-      fetchWithTimeout("https://api.themoviedb.org/3/movie/upcoming?api_key=" + key + "&language=de-DE&page=1", 12000),
-      fetchWithTimeout("https://api.themoviedb.org/3/movie/now_playing?api_key=" + key + "&language=de-DE&page=1", 12000),
-    ]);
-    const upHtml = (upcoming.results || []).slice(0, 16).map(entMovieCard).join("");
-    const nowHtml = (nowPlaying.results || []).slice(0, 16).map(entMovieCard).join("");
-    setGrid("moviesGrid",    upHtml  || '<div class="ent-empty">Keine Daten gefunden.</div>');
-    setGrid("nowPlayingGrid", nowHtml || '<div class="ent-empty">Keine Daten gefunden.</div>');
-  } catch {
-    setGrid("moviesGrid", '<div class="ent-error">❌ Fehler beim Laden — TMDB API-Key korrekt?</div>');
-    setGrid("nowPlayingGrid", "");
-  }
-}
-
-function entMovieCard(m) {
-  const img = m.poster_path
-    ? "<img class=\"ent-poster\" src=\"" + TMDB_IMG + m.poster_path + "\" alt=\"\" loading=\"lazy\" />"
-    : "<div class=\"ent-poster ent-no-img\">🎬</div>";
-  const date = m.release_date
-    ? new Date(m.release_date).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })
-    : "–";
-  const stars = m.vote_average && m.vote_average > 0
-    ? "<span class=\"ent-stars\">" + "★".repeat(Math.round(m.vote_average / 2)) + "☆".repeat(5 - Math.round(m.vote_average / 2)) + " " + m.vote_average.toFixed(1) + "</span>"
+function entArticleCard(item, fallbackEmoji) {
+  const imgHtml = item.image
+    ? "<img class=\"ent-card-img\" src=\"" + item.image + "\" alt=\"\" loading=\"lazy\" onerror=\"this.style.display='none'\" />"
     : "";
-  const desc = m.overview
-    ? m.overview.slice(0, 130) + (m.overview.length > 130 ? "…" : "")
-    : "<em>Keine Beschreibung verfügbar.</em>";
-  const url = "https://www.themoviedb.org/movie/" + m.id;
-  return "<a class=\"ent-movie-card\" href=\"" + url + "\" target=\"_blank\" rel=\"noopener\">" +
-    img +
-    "<div class=\"ent-card-body\">" +
-      "<div class=\"ent-card-title\">" + m.title + "</div>" +
-      "<div class=\"ent-card-date\">" + date + "</div>" +
-      (stars ? "<div class=\"ent-card-rating\">" + stars + "</div>" : "") +
-      "<div class=\"ent-card-desc\">" + desc + "</div>" +
-    "</div>" +
-  "</a>";
-}
-
-// ── Games (RAWG) ──
-
-async function entLoadGames(key) {
-  const setGrid = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  const spin = '<div class="ent-loading"><div class="ent-spinner"></div> Lade Spieldaten…</div>';
-  setGrid("upcomingGamesGrid", spin);
-  setGrid("recentGamesGrid", spin);
-
-  const today  = entDate(0);
-  const future = entDate(90);
-  const past   = entDate(-45);
-
-  try {
-    const [upcoming, recent] = await Promise.all([
-      fetchWithTimeout("https://api.rawg.io/api/games?key=" + key + "&dates=" + today + "," + future + "&ordering=released&page_size=20", 14000),
-      fetchWithTimeout("https://api.rawg.io/api/games?key=" + key + "&dates=" + past + "," + today + "&ordering=-released&page_size=20", 14000),
-    ]);
-    const upHtml  = (upcoming.results || []).map(entGameCard).join("");
-    const recHtml = (recent.results  || []).map(entGameCard).join("");
-    setGrid("upcomingGamesGrid", upHtml  || '<div class="ent-empty">Keine kommenden Spiele gefunden.</div>');
-    setGrid("recentGamesGrid",   recHtml || '<div class="ent-empty">Keine Daten gefunden.</div>');
-  } catch {
-    setGrid("upcomingGamesGrid", '<div class="ent-error">❌ Fehler beim Laden — RAWG API-Key korrekt?</div>');
-    setGrid("recentGamesGrid", "");
-  }
-}
-
-function entGameCard(g) {
-  const img = g.background_image
-    ? "<img class=\"ent-game-img\" src=\"" + g.background_image + "\" alt=\"\" loading=\"lazy\" />"
-    : "<div class=\"ent-game-img ent-no-img\">🎮</div>";
-  const date = g.released
-    ? new Date(g.released).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })
-    : "TBA";
-  const rating = g.rating
-    ? "<span class=\"ent-stars\">★ " + g.rating.toFixed(1) + "<span class=\"ent-votes\"> / " + (g.ratings_count || 0).toLocaleString("de-CH") + " Stimmen</span></span>"
+  const desc = item.desc
+    ? "<div class=\"ent-card-desc\">" + item.desc.slice(0, 160) + (item.desc.length > 160 ? "…" : "") + "</div>"
     : "";
-  const genres   = (g.genres   || []).slice(0, 3).map(x => x.name).join(" · ");
-  const platforms = (g.platforms || []).slice(0, 5).map(p => {
-    const n = p.platform.name;
-    if (n.includes("PC"))       return "💻";
-    if (n.includes("PlayStation")) return "🎮";
-    if (n.includes("Xbox"))     return "🟩";
-    if (n.includes("Switch"))   return "🔴";
-    if (n.includes("iOS") || n.includes("Android")) return "📱";
-    return n;
-  }).join(" ");
-  const url = "https://rawg.io/games/" + g.slug;
-  return "<a class=\"ent-game-card\" href=\"" + url + "\" target=\"_blank\" rel=\"noopener\">" +
-    img +
+  const meta = [item.source, item.date].filter(Boolean).join(" · ");
+  return "<a class=\"ent-article-card\" href=\"" + item.url + "\" target=\"_blank\" rel=\"noopener\">" +
+    (imgHtml ? "<div class=\"ent-card-img-wrap\">" + imgHtml + "</div>" : "") +
     "<div class=\"ent-card-body\">" +
-      "<div class=\"ent-card-title\">" + g.name + "</div>" +
-      "<div class=\"ent-card-date\">" + date + (platforms ? " &nbsp;·&nbsp; " + platforms : "") + "</div>" +
-      (rating  ? "<div class=\"ent-card-rating\">" + rating  + "</div>" : "") +
-      (genres  ? "<div class=\"ent-card-genre\">" + genres   + "</div>" : "") +
+      "<div class=\"ent-card-title\">" + item.title + "</div>" +
+      (meta ? "<div class=\"ent-card-meta\">" + meta + "</div>" : "") +
+      desc +
     "</div>" +
   "</a>";
 }

@@ -22,6 +22,7 @@ run_script sport
 run_script stocks
 run_script coins
 run_script commodities
+run_script entertainment
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Update abgeschlossen" >> "$LOG_DIR/update.log"
 echo "----------------------------------------" >> "$LOG_DIR/update.log"
