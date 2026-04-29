@@ -5,31 +5,35 @@ mkdir -p "$DATA_DIR" "$LOG_DIR"
 OUT_FILE="$DATA_DIR/commodities.json"; TMP_FILE="$DATA_DIR/commodities.tmp"
 TMPD=$(mktemp -d)
 
-# Format: YAHOO|STOOQ
+# Yahoo Finance futures symbols
 COMMODITIES=(
-  "GC=F|xauusd"   "SI=F|xagusd"   "PL=F|xptusd"   "PA=F|xpdusd"
-  "HG=F|hg.f"     "CL=F|cl.f"     "BZ=F|co.f"     "NG=F|ng.f"
-  "RB=F|rb.f"     "ZW=F|w.f"      "ZC=F|c.f"       "ZS=F|s.f"
-  "ZO=F|o.f"      "ZR=F|rr.f"     "CC=F|cc.f"      "SB=F|sb.f"
-  "CT=F|ct.f"
+  "GC=F" "SI=F" "PL=F" "PA=F"
+  "HG=F" "CL=F" "BZ=F" "NG=F"
+  "RB=F" "ZW=F" "ZC=F" "ZS=F"
+  "ZO=F" "ZR=F" "CC=F" "SB=F"
+  "CT=F"
 )
 
 fetch_commodity() {
-  local IFS='|'
-  read -r yahoo stooq <<< "$1"
-  local raw row open close
-  raw=$(curl -sf --max-time 12 -A "Mozilla/5.0" \
-    "https://stooq.com/q/l/?s=${stooq}&f=sd2t2ohlcv&h&e=csv") || return
-  row=$(printf '%s\n' "$raw" | sed -n '2p')
-  open=$(printf '%s' "$row"  | cut -d, -f4)
-  close=$(printf '%s' "$row" | cut -d, -f7)
-  [[ -z "$close" || "$close" == "N/D" || "$close" == "0" ]] && return
-  awk -v sy="$yahoo" -v op="$open" -v cl="$close" 'BEGIN {
-    ch  = cl - op
-    chp = (op != 0) ? ch / op * 100 : 0
-    printf "{\"symbol\":\"%s\",\"price\":%.4f,\"change\":%.4f,\"changePercent\":%.2f,\"currency\":\"USD\"}\n",
-      sy, cl+0, ch, chp
-  }' > "$TMPD/${yahoo//[^a-zA-Z0-9]/_}.json"
+  local sym="$1"
+  local raw
+  raw=$(curl -sf --max-time 12 \
+    -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+    "https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d") || return
+  echo "$raw" | jq -e --arg sy "$sym" '
+    .chart.result[0] |
+    .meta as $m |
+    ($m.regularMarketPrice) as $cl |
+    ((.indicators.quote[0].open // []) | last // $m.chartPreviousClose) as $op |
+    select($cl != null and $cl != 0) |
+    {
+      symbol: $sy,
+      price:  $cl,
+      change: ($cl - $op),
+      changePercent: (if ($op // 0) != 0 then ($cl - $op) / $op * 100 else 0 end),
+      currency: $m.currency
+    }
+  ' 2>/dev/null > "$TMPD/${sym//[^a-zA-Z0-9]/_}.json"
 }
 
 fetch_electricity() {
@@ -54,10 +58,9 @@ fetch_electricity() {
   done
 }
 
-# Parallel in 6er-Batches (wie Python max_workers=6) — Stooq rate-limit vermeiden
 batch=0
-for entry in "${COMMODITIES[@]}"; do
-  fetch_commodity "$entry" &
+for sym in "${COMMODITIES[@]}"; do
+  fetch_commodity "$sym" &
   (( ++batch % 6 == 0 )) && wait
 done
 fetch_electricity &
