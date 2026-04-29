@@ -387,32 +387,70 @@
 
 <footer class="footer">
   <span id="lastUpdate">–</span>
+  <button class="sources-btn" onclick="openSourcesModal()">Datenquellen</button>
+</footer>
 
-  <div class="sources-row">
-    <span class="sources-label">Datenquellen</span>
-    <div class="sources-chips">
-      <a class="source-chip" href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>
-      <a class="source-chip" href="https://stooq.com" target="_blank" rel="noopener">Stooq</a>
-      <a class="source-chip" href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a>
-      <a class="source-chip" href="https://api.energy-charts.info" target="_blank" rel="noopener">energy-charts.info</a>
-      <a class="source-chip" href="https://www.srf.ch" target="_blank" rel="noopener">SRF</a>
-      <a class="source-chip" href="https://www.blick.ch" target="_blank" rel="noopener">Blick</a>
-      <a class="source-chip" href="https://www.20min.ch" target="_blank" rel="noopener">20 Minuten</a>
-      <a class="source-chip" href="https://www.nzz.ch" target="_blank" rel="noopener">NZZ</a>
-      <a class="source-chip" href="https://www.watson.ch" target="_blank" rel="noopener">Watson</a>
-      <a class="source-chip" href="https://www.bbc.com/sport" target="_blank" rel="noopener">BBC Sport</a>
-      <a class="source-chip" href="https://www.sport.de" target="_blank" rel="noopener">sport.de</a>
-      <a class="source-chip" href="https://www.ign.com" target="_blank" rel="noopener">IGN</a>
-      <a class="source-chip" href="https://www.gamespot.com" target="_blank" rel="noopener">GameSpot</a>
-      <a class="source-chip" href="https://kotaku.com" target="_blank" rel="noopener">Kotaku</a>
-      <a class="source-chip" href="https://www.eurogamer.net" target="_blank" rel="noopener">Eurogamer</a>
-      <a class="source-chip" href="https://www.pcgamer.com" target="_blank" rel="noopener">PC Gamer</a>
-      <a class="source-chip" href="https://screenrant.com" target="_blank" rel="noopener">Screen Rant</a>
-      <a class="source-chip" href="https://collider.com" target="_blank" rel="noopener">Collider</a>
-      <a class="source-chip" href="https://variety.com" target="_blank" rel="noopener">Variety</a>
+<!-- Sources Modal -->
+<div class="modal-overlay" id="sourcesOverlay" onclick="closeSourcesModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <span class="modal-title">Datenquellen</span>
+      <button class="modal-close" onclick="closeSourcesModal()">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="sources-section">
+        <div class="sources-section-label">Wetter</div>
+        <div class="sources-chips">
+          <a class="source-chip" href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>
+        </div>
+      </div>
+      <div class="sources-section">
+        <div class="sources-section-label">Märkte &amp; Rohstoffe</div>
+        <div class="sources-chips">
+          <a class="source-chip" href="https://finance.yahoo.com" target="_blank" rel="noopener">Yahoo Finance</a>
+          <a class="source-chip" href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a>
+          <a class="source-chip" href="https://api.energy-charts.info" target="_blank" rel="noopener">energy-charts.info</a>
+        </div>
+      </div>
+      <div class="sources-section">
+        <div class="sources-section-label">News</div>
+        <div class="sources-chips">
+          <a class="source-chip" href="https://www.srf.ch" target="_blank" rel="noopener">SRF</a>
+          <a class="source-chip" href="https://www.blick.ch" target="_blank" rel="noopener">Blick</a>
+          <a class="source-chip" href="https://www.20min.ch" target="_blank" rel="noopener">20 Minuten</a>
+          <a class="source-chip" href="https://www.nzz.ch" target="_blank" rel="noopener">NZZ</a>
+          <a class="source-chip" href="https://www.watson.ch" target="_blank" rel="noopener">Watson</a>
+        </div>
+      </div>
+      <div class="sources-section">
+        <div class="sources-section-label">Sport</div>
+        <div class="sources-chips">
+          <a class="source-chip" href="https://www.srf.ch/sport" target="_blank" rel="noopener">SRF Sport</a>
+          <a class="source-chip" href="https://www.blick.ch/sport" target="_blank" rel="noopener">Blick Sport</a>
+          <a class="source-chip" href="https://www.nzz.ch/sport" target="_blank" rel="noopener">NZZ Sport</a>
+          <a class="source-chip" href="https://www.watson.ch/sport" target="_blank" rel="noopener">Watson Sport</a>
+          <a class="source-chip" href="https://www.bbc.com/sport" target="_blank" rel="noopener">BBC Sport</a>
+          <a class="source-chip" href="https://www.sport.de" target="_blank" rel="noopener">sport.de</a>
+        </div>
+      </div>
+      <div class="sources-section">
+        <div class="sources-section-label">Entertainment</div>
+        <div class="sources-chips">
+          <a class="source-chip" href="https://www.ign.com" target="_blank" rel="noopener">IGN</a>
+          <a class="source-chip" href="https://www.gamespot.com" target="_blank" rel="noopener">GameSpot</a>
+          <a class="source-chip" href="https://kotaku.com" target="_blank" rel="noopener">Kotaku</a>
+          <a class="source-chip" href="https://www.eurogamer.net" target="_blank" rel="noopener">Eurogamer</a>
+          <a class="source-chip" href="https://www.pcgamer.com" target="_blank" rel="noopener">PC Gamer</a>
+          <a class="source-chip" href="https://screenrant.com" target="_blank" rel="noopener">Screen Rant</a>
+          <a class="source-chip" href="https://collider.com" target="_blank" rel="noopener">Collider</a>
+          <a class="source-chip" href="https://variety.com" target="_blank" rel="noopener">Variety</a>
+        </div>
+      </div>
     </div>
   </div>
-</footer>
+</div>
 
 <!-- Sidebar Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>

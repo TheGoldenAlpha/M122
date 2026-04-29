@@ -598,6 +598,19 @@ function closeSidebar() {
   document.body.style.overflow = "";
 }
 
+// ── Sources Modal ──
+function openSourcesModal() {
+  document.getElementById("sourcesOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeSourcesModal() {
+  document.getElementById("sourcesOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeSourcesModal();
+});
+
 function sidebarNav(section) {
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
