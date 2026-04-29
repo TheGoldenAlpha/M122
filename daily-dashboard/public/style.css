@@ -1265,7 +1265,7 @@ body {
   display: flex;
 }
 .modal-box {
-  background: var(--bg-card);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   width: 100%;
@@ -1299,7 +1299,7 @@ body {
   height: 30px;
   border-radius: 8px;
   border: none;
-  background: var(--bg-hover);
+  background: var(--bg);
   color: var(--text-muted);
   cursor: pointer;
   display: flex;
@@ -1340,7 +1340,7 @@ body {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-section);
+  background: var(--bg);
   border: 1px solid var(--border);
   text-decoration: none;
   transition: color .15s, border-color .15s, background .15s;
@@ -1349,7 +1349,7 @@ body {
 .source-chip:hover {
   color: var(--accent);
   border-color: var(--accent);
-  background: var(--bg-hover);
+  background: var(--accent-light);
 }
 
 /* â”€â”€ RESPONSIVE â”€â”€ */
