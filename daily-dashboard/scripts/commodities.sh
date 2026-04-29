@@ -1,115 +1,72 @@
 #!/bin/bash
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DATA_DIR="$PROJECT_DIR/data"
-LOG_DIR="$PROJECT_DIR/logs"
+DATA_DIR="$PROJECT_DIR/data"; LOG_DIR="$PROJECT_DIR/logs"
 mkdir -p "$DATA_DIR" "$LOG_DIR"
-OUT_FILE="$DATA_DIR/commodities.json"
-TMP_FILE="$DATA_DIR/commodities.tmp"
+OUT_FILE="$DATA_DIR/commodities.json"; TMP_FILE="$DATA_DIR/commodities.tmp"
+TMPD=$(mktemp -d)
 
-python3 - << 'PYEOF' > "$TMP_FILE"
-import urllib.request, csv, io, json, sys
-from concurrent.futures import ThreadPoolExecutor
+# Format: YAHOO|STOOQ
+COMMODITIES=(
+  "GC=F|xauusd"   "SI=F|xagusd"   "PL=F|xptusd"   "PA=F|xpdusd"
+  "HG=F|hg.f"     "CL=F|cl.f"     "BZ=F|co.f"     "NG=F|ng.f"
+  "RB=F|rb.f"     "ZW=F|w.f"      "ZC=F|c.f"       "ZS=F|s.f"
+  "ZO=F|o.f"      "ZR=F|rr.f"     "CC=F|cc.f"      "SB=F|sb.f"
+  "CT=F|ct.f"
+)
 
-# Stooq-Symbole für Rohstoffe (Yahoo-Symbol → Stooq-Symbol)
-SYMBOLS = {
-    "GC=F": "xauusd",   # Gold (Spot USD/oz)
-    "SI=F": "xagusd",   # Silber (Spot USD/oz)
-    "PL=F": "xptusd",   # Platin (Spot)
-    "PA=F": "xpdusd",   # Palladium (Spot)
-    "HG=F": "hg.f",     # Kupfer Futures
-    "CL=F": "cl.f",     # Rohöl WTI Futures
-    "BZ=F": "co.f",     # Rohöl Brent Futures
-    "NG=F": "ng.f",     # Erdgas Futures
-    "RB=F": "rb.f",     # Benzin RBOB Futures
-    "ZW=F": "w.f",      # Weizen Futures
-    "ZC=F": "c.f",      # Mais Futures
-    "ZS=F": "s.f",      # Sojabohnen Futures
-    "ZO=F": "o.f",      # Hafer Futures
-    "ZR=F": "rr.f",     # Reis Futures
-    "CC=F": "cc.f",     # Kakao Futures
-    "SB=F": "sb.f",     # Zucker Futures
-    "CT=F": "ct.f",     # Baumwolle Futures
+fetch_commodity() {
+  local IFS='|'
+  read -r yahoo stooq <<< "$1"
+  local raw row open close
+  raw=$(curl -sf --max-time 12 -A "Mozilla/5.0" \
+    "https://stooq.com/q/l/?s=${stooq}&f=sd2t2ohlcv&h&e=csv") || return
+  row=$(printf '%s\n' "$raw" | sed -n '2p')
+  open=$(printf '%s' "$row"  | cut -d, -f4)
+  close=$(printf '%s' "$row" | cut -d, -f7)
+  [[ -z "$close" || "$close" == "N/D" || "$close" == "0" ]] && return
+  awk -v sy="$yahoo" -v op="$open" -v cl="$close" 'BEGIN {
+    ch  = cl - op
+    chp = (op != 0) ? ch / op * 100 : 0
+    printf "{\"symbol\":\"%s\",\"price\":%.4f,\"change\":%.4f,\"changePercent\":%.2f,\"currency\":\"USD\"}\n",
+      sy, cl+0, ch, chp
+  }' > "$TMPD/${yahoo//[^a-zA-Z0-9]/_}.json"
 }
 
-def fetch(yahoo_sym):
-    stooq = SYMBOLS.get(yahoo_sym)
-    if not stooq:
-        return None
-    url = f"https://stooq.com/q/l/?s={stooq}&f=sd2t2ohlcv&h&e=csv"
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=12) as r:
-            text = r.read().decode()
-        row = next(csv.DictReader(io.StringIO(text)), None)
-        if not row:
-            return None
-        close = float(row.get("Close") or 0)
-        open_ = float(row.get("Open") or 0)
-        if close == 0:
-            return None
-        ch  = round(close - open_, 4)
-        chp = round((ch / open_ * 100) if open_ else 0, 2)
-        return {
-            "symbol":        yahoo_sym,
-            "price":         round(close, 4),
-            "change":        ch,
-            "changePercent": chp,
-            "currency":      "USD",
-        }
-    except Exception:
-        return None
+fetch_electricity() {
+  for bzn in CH DE-LU; do
+    local raw
+    raw=$(curl -sf --max-time 14 -A "Mozilla/5.0" \
+      "https://api.energy-charts.info/price?bzn=${bzn}") || continue
+    echo "$raw" | jq -e '
+      (.price | to_entries | map(select(.value != null)) | last) as $last |
+      (($last.key - 24) | if . >= 0 then . else null end) as $pi |
+      {
+        symbol:        "ELEC_EU",
+        price:         $last.value,
+        change:        (if $pi != null and .price[$pi] != null
+                        then ($last.value - .price[$pi]) else 0 end),
+        changePercent: (if $pi != null and (.price[$pi] // 0) != 0
+                        then (($last.value - .price[$pi]) / .price[$pi] * 100)
+                        else 0 end),
+        currency:      "EUR"
+      }
+    ' 2>/dev/null > "$TMPD/ELEC_EU.json" && return
+  done
+}
 
-def fetch_electricity():
-    # Day-Ahead Spotpreise CH, Fallback DE-LU (Fraunhofer ISE energy-charts.info)
-    for bzn in ["CH", "DE-LU"]:
-        try:
-            url = f"https://api.energy-charts.info/price?bzn={bzn}"
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (AllMyDay Dashboard)"})
-            with urllib.request.urlopen(req, timeout=14) as r:
-                data = json.loads(r.read())
-            prices = data.get("price", [])
-            # Letzten nicht-None Preis nehmen
-            valid = [(p, i) for i, p in enumerate(prices) if p is not None]
-            if not valid:
-                continue
-            last_price, last_idx = valid[-1]
-            # Vortagespreis: gleiche Stunde gestern (24 Stunden zurück)
-            prev_idx = last_idx - 24
-            prev_price = prices[prev_idx] if prev_idx >= 0 and prices[prev_idx] is not None else None
-            ch  = round(last_price - prev_price, 2) if prev_price is not None else 0
-            chp = round((ch / prev_price * 100) if prev_price else 0, 2)
-            return {
-                "symbol":        "ELEC_EU",
-                "price":         round(last_price, 2),
-                "change":        ch,
-                "changePercent": chp,
-                "currency":      "EUR",
-                "source":        bzn,
-            }
-        except Exception:
-            continue
-    return None
+for entry in "${COMMODITIES[@]}"; do
+  fetch_commodity "$entry" &
+done
+fetch_electricity &
+wait
 
-with ThreadPoolExecutor(max_workers=6) as ex:
-    results = [r for r in ex.map(fetch, SYMBOLS.keys()) if r]
+jq -s '.' "$TMPD"/*.json 2>/dev/null > "$TMP_FILE"
+rm -rf "$TMPD"
 
-elec = fetch_electricity()
-if elec:
-    results.append(elec)
-
-if results:
-    print(json.dumps(results, ensure_ascii=False))
-    sys.exit(0)
-else:
-    print(json.dumps([]))
-    sys.exit(1)
-PYEOF
-
-STATUS=$?
-if [ $STATUS -eq 0 ] && [ -s "$TMP_FILE" ] && [ "$(cat "$TMP_FILE")" != "[]" ]; then
-    mv "$TMP_FILE" "$OUT_FILE"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [commodities] OK" >> "$LOG_DIR/update.log"
+if [ -s "$TMP_FILE" ] && [ "$(cat "$TMP_FILE")" != "[]" ]; then
+  mv "$TMP_FILE" "$OUT_FILE"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [commodities] OK" >> "$LOG_DIR/update.log"
 else
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [commodities] FEHLER" >> "$LOG_DIR/update.log"
-    rm -f "$TMP_FILE"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [commodities] FEHLER" >> "$LOG_DIR/update.log"
+  rm -f "$TMP_FILE"
 fi

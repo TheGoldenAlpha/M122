@@ -571,9 +571,7 @@ async function loadSport() {
 
 // ── Dark Mode ──
 function initDarkMode() {
-  const saved = localStorage.getItem("theme");
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  if (saved === "dark" || (!saved && prefersDark)) {
+  if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
     const cb = document.getElementById("darkToggleSidebar");
     if (cb) cb.checked = true;
