@@ -54,8 +54,11 @@ fetch_electricity() {
   done
 }
 
+# Parallel in 6er-Batches (wie Python max_workers=6) — Stooq rate-limit vermeiden
+batch=0
 for entry in "${COMMODITIES[@]}"; do
   fetch_commodity "$entry" &
+  (( ++batch % 6 == 0 )) && wait
 done
 fetch_electricity &
 wait

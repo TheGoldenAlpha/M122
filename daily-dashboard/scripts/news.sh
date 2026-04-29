@@ -15,7 +15,7 @@ FEEDS=(
   "Watson|https://www.watson.ch/api/feeds/rss"
 )
 
-# Parse RSS/Atom XML: outputs "title\tlink" per item (max 4)
+# Parse RSS/Atom XML: outputs "title\tlink" per item (max 8)
 rss_parse() {
   sed 's|<link\([^>]*\)href="\([^"]*\)"\([^/]*\)/>|<link>\2</link>|g' \
   | awk '
@@ -32,7 +32,7 @@ rss_parse() {
       if (s ~ /^https?:/ && s !~ /google\.com/) l=s
     }
     /<\/item>|<\/entry>/ { if (in_item && t && l) print t "\t" l; in_item=0 }
-  ' | head -4
+  ' | head -8
 }
 
 fetch_feed() {
@@ -49,9 +49,9 @@ for i in "${!FEEDS[@]}"; do
 done
 wait
 
-# Deduplicate by title prefix (40 chars), limit 20, build JSON
+# Deduplicate by title prefix (55 chars), limit 20, build JSON
 find "$TMPD" -name "*.tsv" -exec cat {} \; 2>/dev/null \
-  | awk -F'\t' '!seen[substr($1,1,40)]++ && NR<=30' \
+  | awk -F'\t' '!seen[substr($1,1,55)]++ && NR<=60' \
   | head -20 \
   | jq -Rsc '
       split("\n") | map(select(. != "") | split("\t") | select(length >= 3) |

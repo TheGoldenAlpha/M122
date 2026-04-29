@@ -71,8 +71,11 @@ fetch_stock() {
   }' > "$TMPD/${idx}.json"
 }
 
+# Parallel in 10er-Batches (wie Python max_workers=10)
+batch=0
 for i in "${!STOCKS[@]}"; do
   fetch_stock "$i" &
+  (( ++batch % 10 == 0 )) && wait
 done
 wait
 
