@@ -137,15 +137,15 @@
         <div class="city-selector">
           <i data-lucide="map-pin"></i>
           <select id="citySelect" onchange="loadWeatherDetail()">
-            <option value="47.3769,8.5417">Zürich</option>
-            <option value="46.9481,7.4474">Bern</option>
-            <option value="47.5596,7.5886">Basel</option>
-            <option value="46.2044,6.1432">Genf</option>
-            <option value="46.5197,6.6323">Lausanne</option>
-            <option value="47.0502,8.3093">Luzern</option>
-            <option value="47.4245,9.3767">St. Gallen</option>
-            <option value="46.0037,8.9511">Lugano</option>
-            <option value="47.4994,8.7240">Winterthur</option>
+            <option value="zurich">Zürich</option>
+            <option value="bern">Bern</option>
+            <option value="basel">Basel</option>
+            <option value="genf">Genf</option>
+            <option value="lausanne">Lausanne</option>
+            <option value="luzern">Luzern</option>
+            <option value="stgallen">St. Gallen</option>
+            <option value="lugano">Lugano</option>
+            <option value="winterthur">Winterthur</option>
           </select>
         </div>
       </div>
@@ -500,6 +500,22 @@
 </aside>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script src="app.js"></script>
+<!-- core: hilfsfunktionen, uhr, navigation, theme, start -->
+<script src="js/core/utils.js"></script>
+<script src="js/core/clock.js"></script>
+<script src="js/core/theme.js"></script>
+<script src="js/core/nav.js"></script>
+<!-- markets: finanzielle daten -->
+<script src="js/markets/crypto.js"></script>
+<script src="js/markets/commodities.js"></script>
+<script src="js/markets/stocks.js"></script>
+<script src="js/markets/coins.js"></script>
+<!-- views: inhaltsbereiche -->
+<script src="js/views/weather.js"></script>
+<script src="js/views/news.js"></script>
+<script src="js/views/sport.js"></script>
+<script src="js/views/entertainment.js"></script>
+<!-- init: app-start (zuletzt, da alle module oben benötigt werden) -->
+<script src="js/core/init.js"></script>
 </body>
 </html>
