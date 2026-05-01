@@ -51,7 +51,6 @@ function sidebarNav(section) {
   if (section === "rohstoffe")     loadCommodities();
   if (section === "aktien")        loadStocks();
   if (section === "coins")         loadCoins();
-  if (section === "entertainment") loadEntertainment();
   closeSidebar();
 }
 
@@ -71,7 +70,6 @@ function setupNav() {
       if (btn.dataset.section === "rohstoffe")     loadCommodities();
       if (btn.dataset.section === "aktien")        loadStocks();
       if (btn.dataset.section === "coins")         loadCoins();
-      if (btn.dataset.section === "entertainment") loadEntertainment();
     });
   });
   // sport-kacheln in der seitenleiste
