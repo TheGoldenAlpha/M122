@@ -18,9 +18,12 @@ FEEDS=(
   "Variety|https://variety.com/feed/|movies"
 )
 
+# node-pfad: WSL nutzt Windows-Installation, Git Bash nutzt lokales node
+NODE=$(command -v node || command -v node.exe || echo "/mnt/c/Program Files/nodejs/node.exe")
+
 # RSS/Atom parsen mit Node.js — gibt "title\turl\tdate\tdesc\timage" pro item aus (max 25)
 rss_parse_ent() {
-  node << 'EOF'
+  "$NODE" << 'EOF'
 let raw = '';
 process.stdin.on('data', d => raw += d);
 process.stdin.on('end', () => {
