@@ -8,7 +8,7 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') Update gestartet" >> "$LOG_DIR/update.log"
 
 run_script() {
     local name="$1"
-    local script="$PROJECT_DIR/scripts/${name}.sh"
+    local script="$PROJECT_DIR/scripts/api/${name}.sh"
     local start=$(date +%s)
     bash "$script"
     local end=$(date +%s)

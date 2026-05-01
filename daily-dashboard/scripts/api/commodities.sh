@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 DATA_DIR="$PROJECT_DIR/data"; LOG_DIR="$PROJECT_DIR/logs"
 mkdir -p "$DATA_DIR" "$LOG_DIR"
 OUT_FILE="$DATA_DIR/commodities.json"; TMP_FILE="$DATA_DIR/commodities.tmp"
@@ -25,7 +25,7 @@ fetch_commodity() {
     .meta as $m |
     ($m.regularMarketPrice) as $cl |
     ((.indicators.quote[0].open // []) | last // $m.chartPreviousClose) as $op |
-    select($cl != null and $cl != 0) |
+    select($cl != null and $cl != 0) | # Filter out invalid data points (leer)
     {
       symbol: $sy,
       price:  $cl,

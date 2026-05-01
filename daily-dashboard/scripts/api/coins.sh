@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 DATA_DIR="$PROJECT_DIR/data"; LOG_DIR="$PROJECT_DIR/logs"
 mkdir -p "$DATA_DIR" "$LOG_DIR"
 OUT_FILE="$DATA_DIR/coins.json"; TMP_FILE="$DATA_DIR/coins.tmp"

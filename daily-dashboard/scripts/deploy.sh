@@ -1,6 +1,8 @@
 #!/bin/bash
 PROJECT_DIR="/home/florianh/pr2/src/M122"
 
+# startet das ganze Projekt neu! 
+
 echo "==> Neuesten Code holen..."
 cd "$PROJECT_DIR"
 git stash
