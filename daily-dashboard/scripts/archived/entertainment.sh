@@ -18,33 +18,41 @@ FEEDS=(
   "Variety|https://variety.com/feed/|movies"
 )
 
-# node-pfad: WSL nutzt Windows-Installation, Git Bash nutzt lokales node
-NODE=$(command -v node || command -v node.exe || echo "/mnt/c/Program Files/nodejs/node.exe")
-
-# RSS/Atom parsen mit Node.js — gibt "title\turl\tdate\tdesc\timage" pro item aus (max 25)
+# Parse RSS/Atom: outputs "title\turl\tdate\tdesc\timage" per item (max 25)
 rss_parse_ent() {
-  "$NODE" << 'EOF'
-let raw = '';
-process.stdin.on('data', d => raw += d);
-process.stdin.on('end', () => {
-  const tag   = (s, t) => (s.match(new RegExp(`<${t}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${t}>`, 'i')) || [])[1] || '';
-  const clean = s => s.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
-  const items = raw.split(/<item[ >]|<entry[ >]/i).slice(1);
-  let count = 0;
-  for (const item of items) {
-    if (count >= 25) break;
-    const title = clean(tag(item, 'title'));
-    const url   = clean(tag(item, 'link')) || (item.match(/href="(https?[^"]+)"/) || [])[1] || '';
-    const date  = clean(tag(item, 'pubDate') || tag(item, 'updated')).slice(0, 16);
-    const desc  = clean(tag(item, 'description') || tag(item, 'summary')).slice(0, 200);
-    const img   = (item.match(/url="(https?[^"]+\.(?:jpg|jpeg|png|webp))"/i) || [])[1] || '';
-    if (title && url.startsWith('http')) {
-      process.stdout.write(`${title}\t${url}\t${date}\t${desc}\t${img}\n`);
-      count++;
+  sed 's|<link\([^>]*\)href="\([^"]*\)"\([^/]*\)/>|<link>\2</link>|g' \
+  | awk '
+    /<item[ >]|<entry[ >]/ { in_item=1; t=""; l=""; dt=""; ds=""; img="" }
+    in_item && /<title/ {
+      s=$0; gsub(/.*<title[^>]*>(<!\[CDATA\[)?/,"",s); gsub(/(\]\]>)?<\/title>.*/,"",s)
+      gsub(/&amp;/,"\\&",s); gsub(/&lt;/,"<",s); gsub(/&gt;/,">",s)
+      gsub(/^[[:space:]]*/,"",s); gsub(/[[:space:]]*$/,"",s)
+      if (s) t=s
     }
-  }
-});
-EOF
+    in_item && /<link>/ {
+      s=$0; gsub(/.*<link>/,"",s); gsub(/<\/link>.*/,"",s)
+      gsub(/^[[:space:]]*/,"",s)
+      if (s ~ /^https?:/ && s !~ /google\.com/) l=s
+    }
+    in_item && /<pubDate/ && !dt {
+      s=$0; gsub(/.*<pubDate>/,"",s); gsub(/<\/pubDate>.*/,"",s)
+      gsub(/^[[:space:]]*/,"",s); dt=substr(s,1,16)
+    }
+    in_item && /<description/ && !ds {
+      s=$0; gsub(/.*<description[^>]*>(<!\[CDATA\[)?/,"",s); gsub(/(\]\]>)?<\/description>.*/,"",s)
+      gsub(/<[^>]*>/,"",s); gsub(/&amp;/,"\\&",s); gsub(/&lt;/,"<",s); gsub(/&gt;/,">",s)
+      gsub(/[[:space:]]+/," ",s); gsub(/^[[:space:]]*/,"",s)
+      ds=substr(s,1,200)
+    }
+    in_item && !img && /url="http/ {
+      s=$0; gsub(/.*url="/,"",s); gsub(/".*/,"",s)
+      if (s ~ /\.(jpg|jpeg|png|webp)/ && s !~ /\.gif/) img=s
+    }
+    /<\/item>|<\/entry>/ {
+      if (in_item && t && l) print t "\t" l "\t" dt "\t" ds "\t" img
+      in_item=0
+    }
+  ' | head -25
 }
 
 fetch_feed() {

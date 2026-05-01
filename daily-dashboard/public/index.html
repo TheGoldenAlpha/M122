@@ -53,9 +53,6 @@
     <button class="nav-btn" data-section="coins">
       <i data-lucide="bitcoin"></i><span>Coins</span>
     </button>
-    <button class="nav-btn" data-section="entertainment">
-      <i data-lucide="film"></i><span>Entertainment</span>
-    </button>
   </nav>
 </header>
 
@@ -365,23 +362,6 @@
   </section>
 
 
-  <!-- ENTERTAINMENT -->
-  <section id="entertainment" class="section">
-    <div class="section-title"><i data-lucide="film"></i> Entertainment</div>
-
-    <div class="ent-tabs">
-      <button class="ent-tab active" data-tab="gaming" onclick="entSwitchTab(this)">🎮 Gaming</button>
-      <button class="ent-tab" data-tab="movies" onclick="entSwitchTab(this)">🎬 Film & TV</button>
-    </div>
-
-    <div class="ent-panel" id="ent-gaming">
-      <div class="ent-grid" id="gamingGrid"><div class="ent-loading"><div class="ent-spinner"></div> Lade…</div></div>
-    </div>
-
-    <div class="ent-panel" id="ent-movies" style="display:none;">
-      <div class="ent-grid" id="moviesGrid"><div class="ent-loading"><div class="ent-spinner"></div> Lade…</div></div>
-    </div>
-  </section>
 
 </main>
 
@@ -493,9 +473,6 @@
     <button class="sidebar-nav-btn" data-section="coins" onclick="sidebarNav('coins')">
       <i data-lucide="bitcoin"></i>Coins
     </button>
-    <button class="sidebar-nav-btn" data-section="entertainment" onclick="sidebarNav('entertainment')">
-      <i data-lucide="film"></i>Entertainment
-    </button>
   </nav>
 </aside>
 
@@ -514,7 +491,6 @@
 <script src="js/views/weather.js"></script>
 <script src="js/views/news.js"></script>
 <script src="js/views/sport.js"></script>
-<script src="js/views/entertainment.js"></script>
 <!-- init: app-start (zuletzt, da alle module oben benötigt werden) -->
 <script src="js/core/init.js"></script>
 </body>
