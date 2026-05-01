@@ -4,7 +4,7 @@ DATA_DIR="$PROJECT_DIR/data"; LOG_DIR="$PROJECT_DIR/logs"
 mkdir -p "$DATA_DIR" "$LOG_DIR"
 OUT_FILE="$DATA_DIR/coins.json"; TMP_FILE="$DATA_DIR/coins.tmp"
 
-IDS="bitcoin,ethereum,solana,binancecoin,ripple,cardano,avalanche-2,polkadot,chainlink,dogecoin,litecoin,uniswap"
+IDS="bitcoin,ethereum,solana,binancecoin,ripple,cardano,avalanche-2,polkadot,chainlink,dogecoin,litecoin,uniswap" #lesbarkeit!!!
 URL="https://api.coingecko.com/api/v3/coins/markets?vs_currency=chf&ids=${IDS}&order=market_cap_desc&per_page=12&page=1&sparkline=false"
 
 RAW=""
